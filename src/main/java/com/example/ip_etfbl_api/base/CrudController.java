@@ -1,5 +1,6 @@
 package com.example.ip_etfbl_api.base;
 
+import com.example.ip_etfbl_api.exceptions.NotFoundException;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +26,7 @@ public abstract class CrudController<ID extends Serializable, REQ, RESP> {
     }
 
     @GetMapping("/{id}")
-    public RESP findById(@PathVariable ID id)
+    public RESP findById(@PathVariable ID id) throws NotFoundException
     {
         return crudService.findById(id, respClass);
     }
@@ -44,7 +45,7 @@ public abstract class CrudController<ID extends Serializable, REQ, RESP> {
     }
 
     @PutMapping("/{id}")
-    public RESP insert(@RequestBody REQ object,@PathVariable ID id)
+    public RESP update(@RequestBody REQ object,@PathVariable ID id) throws NotFoundException
     {
         return crudService.update(id, object, respClass);
     }

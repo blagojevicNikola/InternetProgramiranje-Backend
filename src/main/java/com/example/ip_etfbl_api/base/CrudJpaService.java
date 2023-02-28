@@ -1,5 +1,6 @@
 package com.example.ip_etfbl_api.base;
 
+import com.example.ip_etfbl_api.exceptions.NotFoundException;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
@@ -62,5 +63,5 @@ public class CrudJpaService<E extends BaseEntity<ID>, ID extends Serializable> i
         repository.deleteById(id);
     }
 
-    public E findEntityById(ID id) {return repository.findById(id).orElse(null);};
+    public E findEntityById(ID id) {return repository.findById(id).orElseThrow(NotFoundException::new);};
 }
