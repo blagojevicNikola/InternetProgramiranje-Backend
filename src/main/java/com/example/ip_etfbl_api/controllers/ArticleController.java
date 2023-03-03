@@ -2,6 +2,7 @@ package com.example.ip_etfbl_api.controllers;
 
 import com.example.ip_etfbl_api.base.CrudController;
 import com.example.ip_etfbl_api.models.responses.Article;
+import com.example.ip_etfbl_api.models.responses.ArticleInfo;
 import com.example.ip_etfbl_api.services.ArticleService;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,5 +23,11 @@ public class ArticleController extends CrudController<Integer, Article, Article>
     public List<Article> getArticlesByArticleTypeName(@PathVariable String name)
     {
         return service.findAllByArticleTypeName(Article.class, name);
+    }
+
+    @GetMapping("/info/{id}")
+    public ArticleInfo getArticleInfoById(@PathVariable Integer id)
+    {
+        return service.getArticleInfoById(id);
     }
 }
