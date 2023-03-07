@@ -18,6 +18,22 @@ public class AdminEntity implements BaseEntity<Integer> {
     @JoinColumn(name = "person_id", referencedColumnName = "id", nullable = false)
     private PersonEntity person;
 
+    public Integer getPersonId() {
+        return personId;
+    }
+
+    public void setPersonId(Integer personId) {
+        this.personId = personId;
+    }
+
+    public PersonEntity getPerson() {
+        return person;
+    }
+
+    public void setPerson(PersonEntity person) {
+        this.person = person;
+    }
+
     @Override
     public Integer getId() {
         return personId;
@@ -26,5 +42,18 @@ public class AdminEntity implements BaseEntity<Integer> {
     @Override
     public void setId(Integer integer) {
         personId=integer;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AdminEntity that = (AdminEntity) o;
+        return Objects.equals(personId, that.personId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(personId);
     }
 }

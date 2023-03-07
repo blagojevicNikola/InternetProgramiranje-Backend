@@ -27,4 +27,5 @@ public class SupportEntity implements BaseEntity<Integer> {
     public void setId(Integer integer) {
         personId = integer;
     }
+
 }

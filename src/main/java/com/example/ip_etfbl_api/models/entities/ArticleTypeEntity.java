@@ -22,5 +22,7 @@ public class ArticleTypeEntity implements BaseEntity<Integer> {
     private List<ArticleEntity> articles;
     @OneToMany(mappedBy = "articleType")
     private List<AttributeStructureEntity> attributeStructure;
+    @OneToMany(mappedBy = "articleType")
+    private List<AttributeStructureEntity> attributeStructures;
 
 }

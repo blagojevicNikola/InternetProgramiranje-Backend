@@ -49,4 +49,5 @@ public class UserEntity implements BaseEntity<Integer> {
     public void setId(Integer integer) {
         personId = integer;
     }
+
 }

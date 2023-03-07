@@ -32,5 +32,8 @@ public class PersonEntity implements BaseEntity<Integer> {
     private SupportEntity support;
     @OneToOne(mappedBy = "person")
     private UserEntity user;
+    @Basic
+    @Column(name = "role", nullable = false)
+    private Object role;
 
 }

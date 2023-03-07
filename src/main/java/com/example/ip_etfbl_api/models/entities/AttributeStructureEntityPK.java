@@ -10,8 +10,14 @@ import java.util.Objects;
 
 public class AttributeStructureEntityPK implements Serializable {
 
+    @Column(name = "name", nullable = false)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer name;
 
+    @Column(name = "article_type_id", nullable = false)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer articleTypeId;
 
     public Integer getName() {

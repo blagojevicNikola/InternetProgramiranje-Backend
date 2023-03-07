@@ -12,8 +12,41 @@ import java.util.Objects;
 @Data
 public class UserCommentsArticleEntityPK implements Serializable {
 
+    @Column(name = "article_id", nullable = false)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer articleId;
-
+    @Column(name = "user_id", nullable = false)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer userId;
 
+    public Integer getArticleId() {
+        return articleId;
+    }
+
+    public void setArticleId(Integer articleId) {
+        this.articleId = articleId;
+    }
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserCommentsArticleEntityPK that = (UserCommentsArticleEntityPK) o;
+        return Objects.equals(articleId, that.articleId) && Objects.equals(userId, that.userId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(articleId, userId);
+    }
 }

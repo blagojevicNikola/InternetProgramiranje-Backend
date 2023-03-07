@@ -10,8 +10,14 @@ import java.util.Objects;
 
 public class MessageEntityPK implements Serializable {
 
+    @Column(name = "id", nullable = false)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(name = "user_id", nullable = false)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer userId;
 
     public Integer getId() {

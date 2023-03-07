@@ -44,6 +44,10 @@ public class ArticleEntity implements BaseEntity<Integer> {
     private List<AttributeEntity> attributes;
     @OneToMany(mappedBy = "article")
     private List<UserCommentsArticleEntity> userComments;
+    @OneToMany(mappedBy = "article")
+    private List<PhotoEntity> photos;
+    @OneToMany(mappedBy = "article")
+    private List<UserCommentsArticleEntity> userCommentsArticles;
 
     public Boolean getNew() {
         return isNew;

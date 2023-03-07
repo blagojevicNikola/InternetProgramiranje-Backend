@@ -10,11 +10,21 @@ import java.util.Objects;
 
 public class OptionsEntityPK implements Serializable {
 
+    @Column(name = "value", nullable = false, length = 100)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer value;
 
+    @Column(name = "structure_name", nullable = false)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer structureName;
 
     private Integer structureTypeId;
+    @Column(name = "article_type_id", nullable = false)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer articleTypeId;
 
     public Integer getValue() {
         return value;
@@ -51,5 +61,13 @@ public class OptionsEntityPK implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(value, structureName, structureTypeId);
+    }
+
+    public Integer getArticleTypeId() {
+        return articleTypeId;
+    }
+
+    public void setArticleTypeId(Integer articleTypeId) {
+        this.articleTypeId = articleTypeId;
     }
 }
