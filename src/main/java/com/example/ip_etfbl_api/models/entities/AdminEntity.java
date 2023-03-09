@@ -10,12 +10,12 @@ import java.util.Objects;
 @Entity
 @Table(name = "admin", schema = "etfbl_ip", catalog = "")
 public class AdminEntity implements BaseEntity<Integer> {
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    @Column(name = "person_id", nullable = false)
+    @Column(name = "person_id")
     private Integer personId;
     @OneToOne
-    @JoinColumn(name = "person_id", referencedColumnName = "id", nullable = false)
+    @MapsId
+    @JoinColumn(name = "person_id", referencedColumnName = "id")
     private PersonEntity person;
 
     public Integer getPersonId() {

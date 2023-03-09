@@ -7,6 +7,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.HandlerMethod;
@@ -37,6 +38,13 @@ public class GlobalExceptionHandler {
     {
         LoggingUtil.logException(e, getLog(handlerMethod));
         return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public final ResponseEntity<Object> handleAuthenticationException(AuthenticationException e, HandlerMethod handlerMethod)
+    {
+        LoggingUtil.logException(e, getLog(handlerMethod));
+        return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
     }
 
     private Log getLog(HandlerMethod handlerMethod)

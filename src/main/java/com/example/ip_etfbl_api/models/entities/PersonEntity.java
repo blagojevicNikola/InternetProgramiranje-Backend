@@ -32,11 +32,14 @@ public class PersonEntity implements BaseEntity<Integer>, UserDetails {
     @Basic
     @Column(name = "surname", nullable = false, length = 45)
     private String surname;
-    @OneToOne(mappedBy = "person")
+    @OneToOne(cascade= CascadeType.ALL, mappedBy = "person")
+    @PrimaryKeyJoinColumn
     private AdminEntity admin;
-    @OneToOne(mappedBy = "person")
+    @OneToOne(cascade= CascadeType.ALL, mappedBy = "person")
+    @PrimaryKeyJoinColumn
     private SupportEntity support;
     @OneToOne(cascade= CascadeType.ALL, mappedBy = "person")
+    @PrimaryKeyJoinColumn
     private UserEntity user;
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)

@@ -11,9 +11,8 @@ import java.util.Objects;
 @Entity
 @Table(name = "user", schema = "etfbl_ip", catalog = "")
 public class UserEntity implements BaseEntity<Integer> {
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    @Column(name = "person_id", nullable = false)
+    @Column(name = "person_id")
     private Integer personId;
     @Basic
     @Column(name = "email", nullable = false, length = 45)
@@ -32,7 +31,8 @@ public class UserEntity implements BaseEntity<Integer> {
     @OneToMany(mappedBy = "user")
     private List<MessageEntity> messages;
     @OneToOne
-    @JoinColumn(name = "person_id", referencedColumnName = "id", nullable = false)
+    @MapsId
+    @JoinColumn(name = "person_id", referencedColumnName = "id")
     private PersonEntity person;
     @ManyToOne
     @JoinColumn(name = "location_id", referencedColumnName = "id", nullable = false)

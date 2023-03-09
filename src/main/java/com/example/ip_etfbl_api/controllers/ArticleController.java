@@ -10,7 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/articles")
-@CrossOrigin(origins = "http://localhost:4200", methods={RequestMethod.GET, RequestMethod.PUT})
+//@CrossOrigin(origins = "http://localhost:4200", methods={RequestMethod.GET, RequestMethod.PUT})
 public class ArticleController extends CrudController<Integer, Article, Article> {
 
     private final ArticleService service;
