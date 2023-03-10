@@ -8,5 +8,5 @@ import java.util.List;
 public interface ArticleEntityRepository extends JpaRepository<ArticleEntity, Integer> {
     List<ArticleEntity> findArticleEntitiesByArticleTypeNameAndDeleted(String name, Boolean deleted);
     List<ArticleEntity> findArticleEntitiesByUserLocationId(Integer id);
-
+    List<ArticleEntity> findArticleEntitiesByDeletedAndSold(Boolean deleted, Boolean sold);
 }

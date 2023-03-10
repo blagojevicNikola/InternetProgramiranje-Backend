@@ -56,4 +56,9 @@ public class ArticleServiceImpl extends CrudJpaService<ArticleEntity, Integer> i
         result.setComments(comments.stream().map(m -> getModelMapper().map(m, Comment.class)).collect(Collectors.toList()));
         return result;
     }
+
+    @Override
+    public <T> List<T> findAllByDeletedAndSold(Class<T> resultDto, Boolean deleted, Boolean sold) {
+        return articleEntityRepository.findArticleEntitiesByDeletedAndSold(deleted,sold).stream().map(m -> this.getModelMapper().map(m,resultDto)).collect(Collectors.toList());
+    }
 }

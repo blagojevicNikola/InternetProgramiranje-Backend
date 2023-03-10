@@ -7,6 +7,9 @@ import java.util.List;
 
 public interface ArticleService extends CrudService<Integer> {
 
-    public <T> List<T> findAllByArticleTypeName(Class<T> resultDto, String name);
-    public ArticleInfo getArticleInfoById(Integer id);
+    <T> List<T> findAllByArticleTypeName(Class<T> resultDto, String name);
+    ArticleInfo getArticleInfoById(Integer id);
+
+    <T> List<T> findAllByDeletedAndSold(Class<T> resultDto, Boolean deleted, Boolean sold);
+
 }

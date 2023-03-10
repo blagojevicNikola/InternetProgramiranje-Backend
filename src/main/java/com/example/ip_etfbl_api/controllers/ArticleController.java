@@ -30,4 +30,10 @@ public class ArticleController extends CrudController<Integer, Article, Article>
     {
         return service.getArticleInfoById(id);
     }
+
+    @GetMapping("/all")
+    public List<Article> getAllArticles()
+    {
+        return service.findAllByDeletedAndSold(Article.class, false, false);
+    }
 }

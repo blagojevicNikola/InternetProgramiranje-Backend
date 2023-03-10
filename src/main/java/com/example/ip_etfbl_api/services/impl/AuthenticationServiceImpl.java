@@ -50,6 +50,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         user.setActivated(true);
         user.setPin(3333);
         user.setEmail(req.getEmail());
+        System.out.println(req.getCityName());
         user.setLocation(locationEntityRepository.findLocationEntityByName(req.getCityName()).get());
         //var savedUser = userEntityRepository.saveAndFlush(user);
         person.setUser(user);
