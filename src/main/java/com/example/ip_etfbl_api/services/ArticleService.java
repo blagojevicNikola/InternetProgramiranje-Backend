@@ -12,4 +12,5 @@ public interface ArticleService extends CrudService<Integer> {
 
     <T> List<T> findAllByDeletedAndSold(Class<T> resultDto, Boolean deleted, Boolean sold);
 
+    <T> List<T> findAllByDeletedAndSoldAndUsername(Class<T> resultDto, Boolean deleted, Boolean sold, String username);
 }

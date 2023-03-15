@@ -25,6 +25,18 @@ public class ArticleController extends CrudController<Integer, Article, Article>
         return service.findAllByArticleTypeName(Article.class, name);
     }
 
+    @GetMapping("/active/user/{name}")
+    public List<Article> getActiveArticlesByUser(@PathVariable String name)
+    {
+        return service.findAllByDeletedAndSoldAndUsername(Article.class, false, false, name);
+    }
+
+    @GetMapping("/sold/user/{name}")
+    public List<Article> getSoldArticlesByUser(@PathVariable String name)
+    {
+        return service.findAllByDeletedAndSoldAndUsername(Article.class, false, true, name);
+    }
+
     @GetMapping("/info/{id}")
     public ArticleInfo getArticleInfoById(@PathVariable Integer id)
     {

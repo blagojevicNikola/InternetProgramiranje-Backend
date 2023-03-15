@@ -9,4 +9,5 @@ public interface ArticleEntityRepository extends JpaRepository<ArticleEntity, In
     List<ArticleEntity> findArticleEntitiesByArticleTypeNameAndDeleted(String name, Boolean deleted);
     List<ArticleEntity> findArticleEntitiesByUserLocationId(Integer id);
     List<ArticleEntity> findArticleEntitiesByDeletedAndSold(Boolean deleted, Boolean sold);
+    List<ArticleEntity> findArticleEntitiesByDeletedAndSoldAndUserPersonUsername(Boolean deleted, Boolean sold, String username);
 }

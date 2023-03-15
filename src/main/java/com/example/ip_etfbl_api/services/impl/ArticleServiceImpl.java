@@ -61,4 +61,9 @@ public class ArticleServiceImpl extends CrudJpaService<ArticleEntity, Integer> i
     public <T> List<T> findAllByDeletedAndSold(Class<T> resultDto, Boolean deleted, Boolean sold) {
         return articleEntityRepository.findArticleEntitiesByDeletedAndSold(deleted,sold).stream().map(m -> this.getModelMapper().map(m,resultDto)).collect(Collectors.toList());
     }
+
+    @Override
+    public <T> List<T> findAllByDeletedAndSoldAndUsername(Class<T> resultDto, Boolean deleted, Boolean sold, String username) {
+        return articleEntityRepository.findArticleEntitiesByDeletedAndSoldAndUserPersonUsername(deleted, sold, username).stream().map(m -> this.getModelMapper().map(m, resultDto)).collect(Collectors.toList());
+    }
 }
