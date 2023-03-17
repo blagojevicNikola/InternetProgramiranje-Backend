@@ -26,6 +26,11 @@ public class UserEntity implements BaseEntity<Integer> {
     @Basic
     @Column(name = "pin", nullable = true)
     private Integer pin;
+
+    @Basic
+    @Column(name = "phone_number", nullable=true)
+    private String phoneNumber;
+
     @OneToMany(mappedBy = "user")
     private List<ArticleEntity> articles;
     @OneToMany(mappedBy = "user")

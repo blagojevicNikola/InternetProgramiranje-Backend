@@ -25,6 +25,11 @@ public class UserCommentsArticleEntity {
     @Basic
     @Column(name = "date_time", nullable = false)
     private Timestamp dateTime;
+
+    @Basic
+    @Column(name="answered_to_id", nullable=true)
+    private Integer answeredToId;
+
     @ManyToOne
     @JoinColumns({@JoinColumn(name = "article_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)})
     private ArticleEntity article;

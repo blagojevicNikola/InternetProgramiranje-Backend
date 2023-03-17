@@ -44,6 +44,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         person.setUsername(req.getUsername());
         person.setPassword(passwordEncoder.encode(req.getPassword()));
         person.setRole(Role.USER);
+        person.setDeleted(false);
         //var savedPerson = personEntityRepository.saveAndFlush(person);
         var user = new UserEntity();
         user.setPerson(person);

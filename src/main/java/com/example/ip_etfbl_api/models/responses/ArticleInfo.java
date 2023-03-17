@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.Getter;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.List;
 
 @Data
@@ -12,7 +13,9 @@ public class ArticleInfo {
     private String title;
     private String details;
     private BigDecimal price;
+    private Timestamp date;
     private Boolean isNew;
     private User user;
     private List<Comment> comments;
+    private List<Attribute> attributes;
 }

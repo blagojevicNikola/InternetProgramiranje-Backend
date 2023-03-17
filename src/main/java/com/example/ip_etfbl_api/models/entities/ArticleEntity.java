@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Objects;
 
@@ -34,6 +35,11 @@ public class ArticleEntity implements BaseEntity<Integer> {
     @Basic
     @Column(name = "deleted", nullable = false)
     private Boolean deleted;
+
+    @Basic
+    @Column(name="date", nullable=false)
+    private Timestamp date;
+
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "person_id", nullable = false)
     private UserEntity user;
