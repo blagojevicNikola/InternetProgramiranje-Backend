@@ -4,6 +4,9 @@ import com.example.ip_etfbl_api.base.CrudController;
 import com.example.ip_etfbl_api.models.responses.Article;
 import com.example.ip_etfbl_api.models.responses.ArticleInfo;
 import com.example.ip_etfbl_api.services.ArticleService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,21 +23,24 @@ public class ArticleController extends CrudController<Integer, Article, Article>
     }
 
     @GetMapping("/type/{name}")
-    public List<Article> getArticlesByArticleTypeName(@PathVariable String name)
+    public Slice<Article> getArticlesByArticleTypeName(@PathVariable String name, @RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
+                                                       @RequestParam(value = "pageSize", defaultValue = "6", required = false) int pageSize)
     {
-        return service.findAllByArticleTypeName(Article.class, name);
+        return service.findAllByArticleTypeName(Article.class, name, pageNo, pageSize);
     }
 
     @GetMapping("/active/user/{name}")
-    public List<Article> getActiveArticlesByUser(@PathVariable String name)
+    public Slice<Article> getActiveArticlesByUser(@PathVariable String name, @RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
+                                                  @RequestParam(value = "pageSize", defaultValue = "6", required = false) int pageSize)
     {
-        return service.findAllByDeletedAndSoldAndUsername(Article.class, false, false, name);
+        return service.findAllByDeletedAndSoldAndUsername(Article.class, false, false, name,pageNo, pageSize);
     }
 
     @GetMapping("/sold/user/{name}")
-    public List<Article> getSoldArticlesByUser(@PathVariable String name)
+    public Slice<Article> getSoldArticlesByUser(@PathVariable String name, @RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
+                                                @RequestParam(value = "pageSize", defaultValue = "6", required = false) int pageSize)
     {
-        return service.findAllByDeletedAndSoldAndUsername(Article.class, false, true, name);
+        return service.findAllByDeletedAndSoldAndUsername(Article.class, false, true, name, pageNo, pageSize);
     }
 
     @GetMapping("/info/{id}")
@@ -44,8 +50,9 @@ public class ArticleController extends CrudController<Integer, Article, Article>
     }
 
     @GetMapping("/all")
-    public List<Article> getAllArticles()
+    public Slice<Article> getAllArticles(@RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
+                                          @RequestParam(value = "pageSize", defaultValue = "6", required = false) int pageSize)
     {
-        return service.findAllByDeletedAndSold(Article.class, false, false);
+        return service.findAllByDeletedAndSold(Article.class, false, false, pageNo, pageSize);
     }
 }

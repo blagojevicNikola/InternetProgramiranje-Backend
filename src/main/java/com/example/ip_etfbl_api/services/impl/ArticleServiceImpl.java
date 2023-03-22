@@ -15,6 +15,9 @@ import com.example.ip_etfbl_api.services.ArticleService;
 import com.example.ip_etfbl_api.models.entities.ArticleEntity;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,9 +38,10 @@ public class ArticleServiceImpl extends CrudJpaService<ArticleEntity, Integer> i
         this.userCommentsArticleEntityRepository = userCommentsArticleEntityRepository;
     }
     @Override
-    public <T> List<T> findAllByArticleTypeName(Class<T> resultDto, String name)
+    public <T> Slice<T> findAllByArticleTypeName(Class<T> resultDto, String name, int pageNo, int pageSize)
     {
-        return articleEntityRepository.findArticleEntitiesByArticleTypeNameAndDeleted(name, false).stream().map(m -> this.getModelMapper().map(m,resultDto)).collect(Collectors.toList());
+        Slice<ArticleEntity> tempSlice = articleEntityRepository.findArticleEntitiesByArticleTypeNameAndDeleted(name, false, PageRequest.of(pageNo,pageSize));
+        return tempSlice.map(m -> this.getModelMapper().map(m, resultDto));
     }
 
     @Override
@@ -58,12 +62,14 @@ public class ArticleServiceImpl extends CrudJpaService<ArticleEntity, Integer> i
     }
 
     @Override
-    public <T> List<T> findAllByDeletedAndSold(Class<T> resultDto, Boolean deleted, Boolean sold) {
-        return articleEntityRepository.findArticleEntitiesByDeletedAndSold(deleted,sold).stream().map(m -> this.getModelMapper().map(m,resultDto)).collect(Collectors.toList());
+    public <T> Slice<T> findAllByDeletedAndSold(Class<T> resultDto, Boolean deleted, Boolean sold, int pageNo, int pageSize) {
+        Slice<ArticleEntity> tempSlice = articleEntityRepository.findArticleEntitiesByDeletedAndSold(deleted,sold, PageRequest.of(pageNo, pageSize));
+        return tempSlice.map(m -> this.getModelMapper().map(m, resultDto));
     }
 
     @Override
-    public <T> List<T> findAllByDeletedAndSoldAndUsername(Class<T> resultDto, Boolean deleted, Boolean sold, String username) {
-        return articleEntityRepository.findArticleEntitiesByDeletedAndSoldAndUserPersonUsername(deleted, sold, username).stream().map(m -> this.getModelMapper().map(m, resultDto)).collect(Collectors.toList());
+    public <T> Slice<T> findAllByDeletedAndSoldAndUsername(Class<T> resultDto, Boolean deleted, Boolean sold, String username, int pageNo, int pageSize) {
+        Slice<ArticleEntity> tempSlice = articleEntityRepository.findArticleEntitiesByDeletedAndSoldAndUserPersonUsername(deleted, sold, username, PageRequest.of(pageNo, pageSize));
+        return tempSlice.map(m -> this.getModelMapper().map(m, resultDto));
     }
 }
