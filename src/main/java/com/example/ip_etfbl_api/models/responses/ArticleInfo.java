@@ -1,7 +1,6 @@
 package com.example.ip_etfbl_api.models.responses;
 
 import lombok.Data;
-import lombok.Getter;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -18,4 +17,5 @@ public class ArticleInfo {
     private User user;
     private List<Comment> comments;
     private List<Attribute> attributes;
+    private List<Photo> photos;
 }
