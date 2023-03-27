@@ -4,27 +4,33 @@ import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
 
 import java.io.Serializable;
 import java.util.Objects;
+
+@AllArgsConstructor
 
 public class AttributeStructureEntityPK implements Serializable {
 
     @Column(name = "name", nullable = false)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer name;
+    private String name;
 
     @Column(name = "article_type_id", nullable = false)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer articleTypeId;
 
-    public Integer getName() {
+    public AttributeStructureEntityPK() {
+    }
+
+    public String getName() {
         return name;
     }
 
-    public void setName(Integer name) {
+    public void setName(String name) {
         this.name = name;
     }
 
@@ -44,8 +50,13 @@ public class AttributeStructureEntityPK implements Serializable {
         return Objects.equals(name, that.name) && Objects.equals(articleTypeId, that.articleTypeId);
     }
 
+    /*
     @Override
     public int hashCode() {
         return Objects.hash(name, articleTypeId);
+    }*/
+
+    public String toString() {
+        return "AttributeStructureEntityPK(name=" + this.getName() + ", articleTypeId=" + this.getArticleTypeId() + ")";
     }
 }
