@@ -1,15 +1,20 @@
 package com.example.ip_etfbl_api.controllers;
 
 import com.example.ip_etfbl_api.base.CrudController;
+import com.example.ip_etfbl_api.models.requests.NewArticleRequest;
 import com.example.ip_etfbl_api.models.responses.Article;
 import com.example.ip_etfbl_api.models.responses.ArticleInfo;
 import com.example.ip_etfbl_api.services.ArticleService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import com.example.ip_etfbl_api.services.PhotoService;
 import org.springframework.data.domain.Slice;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/articles")
@@ -17,10 +22,20 @@ import java.util.List;
 public class ArticleController extends CrudController<Integer, Article, Article> {
 
     private final ArticleService service;
-    protected ArticleController(ArticleService service) {
+    private final PhotoService photoService;
+    protected ArticleController(ArticleService service, PhotoService photoService) {
         super(Article.class, service);
         this.service = service;
+        this.photoService = photoService;
     }
+
+    @PostMapping()
+    public ResponseEntity<ArticleInfo> addArticle(@RequestBody NewArticleRequest newArticle, Authentication authentication) throws IOException {
+        List<String> photoUrls = this.photoService.savePhotos(newArticle.getPhotos());
+        Optional<ArticleInfo> result = this.service.addArticle(newArticle, photoUrls);
+        return result.map(articleInfo -> ResponseEntity.status(200).body(articleInfo)).orElseGet(() -> ResponseEntity.status(409).body(null));
+    }
+
 
     @GetMapping("/type/{name}")
     public Slice<Article> getArticlesByArticleTypeName(@PathVariable String name, @RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
