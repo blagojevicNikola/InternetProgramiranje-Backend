@@ -65,11 +65,15 @@ public class ArticleServiceImpl extends CrudJpaService<ArticleEntity, Integer> i
     }
 
     @Override
-    public Optional<ArticleInfo> addArticle(NewArticleRequest request, List<String> photoUrls) {
+    public Optional<ArticleInfo> addArticle(NewArticleRequest request, List<String> photoUrls, String username) {
         Optional<ArticleTypeEntity> type = this.articleTypeRepository.findById(request.getCategoryId());
         if(type.isEmpty())
             return Optional.empty();
+        Optional<UserEntity> user = this.userEntityRepository.findUserEntityByPersonUsername(username);
+        if(user.isEmpty())
+            return Optional.empty();
         ArticleEntity newArticle = new ArticleEntity();
+        newArticle.setUser(user.get());
         newArticle.setTitle(request.getTitle());
         newArticle.setIsNew(request.getIsNew());
         newArticle.setDate(Timestamp.from(Instant.now()));

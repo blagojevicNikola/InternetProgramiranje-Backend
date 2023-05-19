@@ -7,9 +7,11 @@ import com.example.ip_etfbl_api.models.responses.ArticleInfo;
 import com.example.ip_etfbl_api.services.ArticleService;
 import com.example.ip_etfbl_api.services.PhotoService;
 import org.springframework.data.domain.Slice;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,10 +31,10 @@ public class ArticleController extends CrudController<Integer, Article, Article>
         this.photoService = photoService;
     }
 
-    @PostMapping()
-    public ResponseEntity<ArticleInfo> addArticle(@RequestBody NewArticleRequest newArticle, Authentication authentication) throws IOException {
-        List<String> photoUrls = this.photoService.savePhotos(newArticle.getPhotos());
-        Optional<ArticleInfo> result = this.service.addArticle(newArticle, photoUrls);
+    @PostMapping(value="/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ArticleInfo> addArticle(@RequestPart NewArticleRequest newArticle, @RequestPart List<MultipartFile> photos, Authentication authentication) throws IOException {
+        List<String> photoUrls = this.photoService.savePhotos(photos);
+        Optional<ArticleInfo> result = this.service.addArticle(newArticle, photoUrls, authentication.getName());
         return result.map(articleInfo -> ResponseEntity.status(200).body(articleInfo)).orElseGet(() -> ResponseEntity.status(409).body(null));
     }
 

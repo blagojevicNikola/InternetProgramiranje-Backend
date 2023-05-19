@@ -13,7 +13,7 @@ public interface ArticleService extends CrudService<Integer> {
 
     <T> Slice<T> findAllByArticleTypeName(Class<T> resultDto, String name, int pageNo, int pageSize);
     ArticleInfo getArticleInfoById(Integer id);
-    Optional<ArticleInfo> addArticle(NewArticleRequest request, List<String> photoUrls);
+    Optional<ArticleInfo> addArticle(NewArticleRequest request, List<String> photoUrls, String username);
     <T> Slice<T> findAllByDeletedAndSold(Class<T> resultDto, Boolean deleted, Boolean sold, int pageNo, int pageSize);
 
     <T> Slice<T> findAllByDeletedAndSoldAndUsername(Class<T> resultDto, Boolean deleted, Boolean sold, String username, int pageNo, int pageSize);

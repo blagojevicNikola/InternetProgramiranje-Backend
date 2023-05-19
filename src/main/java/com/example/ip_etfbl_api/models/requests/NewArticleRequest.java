@@ -18,5 +18,4 @@ public class NewArticleRequest {
     private Integer categoryId;
     private List<AttributeRequest> attributes;
     private Boolean isNew;
-    private List<MultipartFile> photos;
 }
