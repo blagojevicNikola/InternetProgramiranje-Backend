@@ -17,7 +17,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @RequiredArgsConstructor
 public class ApplicationConfig {
     private final PersonEntityRepository personEntityRepository;
-
     @Bean
     public UserDetailsService userDetailsService() {
         return new JwtUserServiceImpl(personEntityRepository);
@@ -40,4 +39,5 @@ public class ApplicationConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
 }

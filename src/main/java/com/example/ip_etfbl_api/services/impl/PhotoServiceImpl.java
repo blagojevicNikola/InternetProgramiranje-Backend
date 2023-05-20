@@ -21,10 +21,10 @@ public class PhotoServiceImpl implements PhotoService {
     public List<String> savePhotos(List<MultipartFile> photos) throws IOException {
         List<String> urls = new ArrayList<String>();
         for (MultipartFile photo : photos) {
-            String fileName = UUID.randomUUID().toString() + "-" + photo.getOriginalFilename();
+            String fileName = String.valueOf((UUID.randomUUID().toString() + "-" + photo.getOriginalFilename()).hashCode()) +".png";
             String filePath = photosDir + File.separator + fileName;
             photo.transferTo(new File(filePath));
-            urls.add(filePath);
+            urls.add("./assets/"+fileName);
         }
         return urls;
     }

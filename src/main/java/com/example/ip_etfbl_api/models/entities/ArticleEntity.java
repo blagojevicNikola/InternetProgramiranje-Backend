@@ -46,11 +46,11 @@ public class ArticleEntity implements BaseEntity<Integer> {
     @ManyToOne
     @JoinColumn(name = "type_id", referencedColumnName = "id", nullable = false)
     private ArticleTypeEntity articleType;
-    @OneToMany(mappedBy = "article")
+    @OneToMany(mappedBy = "article", cascade=CascadeType.PERSIST)
     private List<AttributeEntity> attributes;
     @OneToMany(mappedBy = "article")
     private List<UserCommentsArticleEntity> userComments;
-    @OneToMany(mappedBy = "article")
+    @OneToMany(mappedBy = "article", cascade = CascadeType.PERSIST)
     private List<PhotoEntity> photos;
     @OneToMany(mappedBy = "article")
     private List<UserCommentsArticleEntity> userCommentsArticles;

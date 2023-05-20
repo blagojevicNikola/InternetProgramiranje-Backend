@@ -3,6 +3,7 @@ package com.example.ip_etfbl_api.services.impl;
 import com.example.ip_etfbl_api.base.CrudJpaService;
 import com.example.ip_etfbl_api.exceptions.NotFoundException;
 import com.example.ip_etfbl_api.models.entities.*;
+import com.example.ip_etfbl_api.models.requests.AttributeRequest;
 import com.example.ip_etfbl_api.models.requests.NewArticleRequest;
 import com.example.ip_etfbl_api.models.responses.ArticleInfo;
 import com.example.ip_etfbl_api.models.responses.Comment;
@@ -85,9 +86,21 @@ public class ArticleServiceImpl extends CrudJpaService<ArticleEntity, Integer> i
         List<PhotoEntity> photos = new ArrayList<>();
         for (String photoUrl : photoUrls) {
             PhotoEntity tmp = new PhotoEntity();
+            tmp.setArticle(newArticle);
             tmp.setUrl(photoUrl);
+            photos.add(tmp);
         }
         newArticle.setPhotos(photos);
+        List<AttributeEntity> attributes = new ArrayList<>();
+        for(AttributeRequest a : request.getAttributes())
+        {
+            AttributeEntity tmp = new AttributeEntity();
+            tmp.setValue(a.getValue());
+            tmp.setName(a.getName());
+            tmp.setArticle(newArticle);
+            attributes.add(tmp);
+        }
+        newArticle.setAttributes(attributes);
         ArticleEntity e = this.articleEntityRepository.save(newArticle);
         return Optional.of(this.getModelMapper().map(e, ArticleInfo.class));
     }

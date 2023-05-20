@@ -34,6 +34,7 @@ public class ArticleController extends CrudController<Integer, Article, Article>
     @PostMapping(value="/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ArticleInfo> addArticle(@RequestPart NewArticleRequest newArticle, @RequestPart List<MultipartFile> photos, Authentication authentication) throws IOException {
         List<String> photoUrls = this.photoService.savePhotos(photos);
+        photoUrls.forEach(System.out::println);
         Optional<ArticleInfo> result = this.service.addArticle(newArticle, photoUrls, authentication.getName());
         return result.map(articleInfo -> ResponseEntity.status(200).body(articleInfo)).orElseGet(() -> ResponseEntity.status(409).body(null));
     }

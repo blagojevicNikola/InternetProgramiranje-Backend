@@ -11,4 +11,5 @@ public class Article {
     private BigDecimal price;
     private String details;
     private Boolean isNew;
+    private String photoUrl;
 }
