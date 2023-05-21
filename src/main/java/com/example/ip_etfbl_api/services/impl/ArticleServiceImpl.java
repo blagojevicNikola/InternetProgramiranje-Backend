@@ -83,24 +83,8 @@ public class ArticleServiceImpl extends CrudJpaService<ArticleEntity, Integer> i
         newArticle.setPrice(request.getPrice());
         newArticle.setArticleType(type.get());
         newArticle.setDetails(request.getDetails());
-        List<PhotoEntity> photos = new ArrayList<>();
-        for (String photoUrl : photoUrls) {
-            PhotoEntity tmp = new PhotoEntity();
-            tmp.setArticle(newArticle);
-            tmp.setUrl(photoUrl);
-            photos.add(tmp);
-        }
-        newArticle.setPhotos(photos);
-        List<AttributeEntity> attributes = new ArrayList<>();
-        for(AttributeRequest a : request.getAttributes())
-        {
-            AttributeEntity tmp = new AttributeEntity();
-            tmp.setValue(a.getValue());
-            tmp.setName(a.getName());
-            tmp.setArticle(newArticle);
-            attributes.add(tmp);
-        }
-        newArticle.setAttributes(attributes);
+        this.setAttributesInArticle(newArticle, request.getAttributes());
+        this.setPhotosInArticle(newArticle, photoUrls);
         ArticleEntity e = this.articleEntityRepository.save(newArticle);
         return Optional.of(this.getModelMapper().map(e, ArticleInfo.class));
     }
@@ -112,8 +96,74 @@ public class ArticleServiceImpl extends CrudJpaService<ArticleEntity, Integer> i
     }
 
     @Override
+    public Boolean softDelete(Integer id, String username) {
+        ArticleEntity toBeDeleted =  articleEntityRepository.findArticleEntityByIdAndDeletedAndUserPersonUsername(id, false, username);
+        if(toBeDeleted == null)
+            return false;
+        toBeDeleted.setDeleted(true);
+        articleEntityRepository.save(toBeDeleted);
+        return true;
+    }
+
+    @Override
+    public Optional<ArticleInfo> updateArticle(Integer id, NewArticleRequest request, List<String> photos, String username) {
+        Optional<ArticleTypeEntity> type = this.articleTypeRepository.findById(request.getCategoryId());
+        if(type.isEmpty())
+            return Optional.empty();
+        ArticleEntity toBeUpdated = articleEntityRepository.findArticleEntityByIdAndDeletedAndUserPersonUsername(id, false, username);
+        if(toBeUpdated==null)
+        {
+            return Optional.empty();
+        }
+        toBeUpdated.setTitle(request.getTitle());
+        toBeUpdated.setPrice(request.getPrice());
+        toBeUpdated.setDetails(request.getDetails());
+        toBeUpdated.setNew(request.getIsNew());
+        toBeUpdated.setArticleType(type.get());
+        this.setAttributesInArticle(toBeUpdated, request.getAttributes());
+        this.setPhotosInArticle(toBeUpdated, photos);
+        ArticleEntity e = this.articleEntityRepository.save(toBeUpdated);
+        return Optional.of(this.getModelMapper().map(e, ArticleInfo.class));
+    }
+
+
+    @Override
     public <T> Slice<T> findAllByDeletedAndSoldAndUsername(Class<T> resultDto, Boolean deleted, Boolean sold, String username, int pageNo, int pageSize) {
         Slice<ArticleEntity> tempSlice = articleEntityRepository.findArticleEntitiesByDeletedAndSoldAndUserPersonUsername(deleted, sold, username, PageRequest.of(pageNo, pageSize));
         return tempSlice.map(m -> this.getModelMapper().map(m, resultDto));
     }
+
+    private void setAttributesInArticle(ArticleEntity article, List<AttributeRequest> attributesRequest)
+    {
+        List<AttributeEntity> attributes = new ArrayList<>();
+        if(attributesRequest!=null)
+        {
+            for(AttributeRequest a : attributesRequest)
+            {
+                AttributeEntity tmp = new AttributeEntity();
+                tmp.setValue(a.getValue());
+                tmp.setName(a.getName());
+                tmp.setArticle(article);
+                attributes.add(tmp);
+            }
+        }
+        article.setAttributes(attributes);
+    }
+
+    private void setPhotosInArticle(ArticleEntity article, List<String> photoUrls)
+    {
+        List<PhotoEntity> photos = new ArrayList<>();
+        if(photoUrls!=null)
+        {
+            for (String photoUrl : photoUrls) {
+                PhotoEntity tmp = new PhotoEntity();
+                tmp.setArticle(article);
+                tmp.setUrl(photoUrl);
+                photos.add(tmp);
+            }
+        }
+        article.setPhotos(photos);
+    }
+
+
 }

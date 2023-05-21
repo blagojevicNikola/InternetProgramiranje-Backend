@@ -25,16 +25,19 @@ public class ArticleController extends CrudController<Integer, Article, Article>
 
     private final ArticleService service;
     private final PhotoService photoService;
+
     protected ArticleController(ArticleService service, PhotoService photoService) {
         super(Article.class, service);
         this.service = service;
         this.photoService = photoService;
     }
 
-    @PostMapping(value="/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ArticleInfo> addArticle(@RequestPart NewArticleRequest newArticle, @RequestPart List<MultipartFile> photos, Authentication authentication) throws IOException {
-        List<String> photoUrls = this.photoService.savePhotos(photos);
-        photoUrls.forEach(System.out::println);
+    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ArticleInfo> addArticle(@RequestPart NewArticleRequest newArticle, @RequestPart Optional<List<MultipartFile>> photos, Authentication authentication) throws IOException {
+        List<String> photoUrls = null;
+        if (photos.isPresent()) {
+            photoUrls = this.photoService.savePhotos(photos.get());
+        }
         Optional<ArticleInfo> result = this.service.addArticle(newArticle, photoUrls, authentication.getName());
         return result.map(articleInfo -> ResponseEntity.status(200).body(articleInfo)).orElseGet(() -> ResponseEntity.status(409).body(null));
     }
@@ -42,35 +45,65 @@ public class ArticleController extends CrudController<Integer, Article, Article>
 
     @GetMapping("/type/{name}")
     public Slice<Article> getArticlesByArticleTypeName(@PathVariable String name, @RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
-                                                       @RequestParam(value = "pageSize", defaultValue = "6", required = false) int pageSize)
-    {
+                                                       @RequestParam(value = "pageSize", defaultValue = "6", required = false) int pageSize) {
         return service.findAllByArticleTypeName(Article.class, name, pageNo, pageSize);
     }
 
     @GetMapping("/active/user/{name}")
     public Slice<Article> getActiveArticlesByUser(@PathVariable String name, @RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
-                                                  @RequestParam(value = "pageSize", defaultValue = "6", required = false) int pageSize)
-    {
-        return service.findAllByDeletedAndSoldAndUsername(Article.class, false, false, name,pageNo, pageSize);
+                                                  @RequestParam(value = "pageSize", defaultValue = "6", required = false) int pageSize) {
+        return service.findAllByDeletedAndSoldAndUsername(Article.class, false, false, name, pageNo, pageSize);
     }
 
     @GetMapping("/sold/user/{name}")
     public Slice<Article> getSoldArticlesByUser(@PathVariable String name, @RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
-                                                @RequestParam(value = "pageSize", defaultValue = "6", required = false) int pageSize)
-    {
+                                                @RequestParam(value = "pageSize", defaultValue = "6", required = false) int pageSize) {
         return service.findAllByDeletedAndSoldAndUsername(Article.class, false, true, name, pageNo, pageSize);
     }
 
     @GetMapping("/info/{id}")
-    public ArticleInfo getArticleInfoById(@PathVariable Integer id)
-    {
+    public ArticleInfo getArticleInfoById(@PathVariable Integer id) {
         return service.getArticleInfoById(id);
     }
 
     @GetMapping("/all")
     public Slice<Article> getAllArticles(@RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
-                                          @RequestParam(value = "pageSize", defaultValue = "6", required = false) int pageSize)
-    {
+                                         @RequestParam(value = "pageSize", defaultValue = "6", required = false) int pageSize) {
         return service.findAllByDeletedAndSold(Article.class, false, false, pageNo, pageSize);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Void> deleteArticle(@PathVariable("id") int id, Authentication authentication) {
+        String username = authentication.getName();
+        if (service.softDelete(id, username)) {
+            return ResponseEntity.status(204).body(null);
+        }
+        return ResponseEntity.status(409).body(null);
+    }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<ArticleInfo> updateArticle(@PathVariable("id") int id,
+                                                     @RequestPart NewArticleRequest newArticle,
+                                                     @RequestPart Optional<List<MultipartFile>> newPhotos,
+                                                     @RequestPart Optional<List<String>> existingPhotos,
+                                                     Authentication authentication) throws IOException {
+        String username = authentication.getName();
+        List<String> photos = this.getImagesForUpdate(newPhotos, existingPhotos);
+        Optional<ArticleInfo> result = service.updateArticle(id, newArticle, photos, username);
+        if(result.isPresent())
+        {
+            return ResponseEntity.ok(result.get());
+        }
+        return ResponseEntity.status(409).body(null);
+    }
+
+    private List<String> getImagesForUpdate(Optional<List<MultipartFile>> newPhotos, Optional<List<String>> existingPhotos) throws IOException {
+        List<String> result = new ArrayList<>();
+        if(newPhotos.isPresent())
+        {
+            result.addAll(photoService.savePhotos(newPhotos.get()));
+        }
+        existingPhotos.ifPresent(result::addAll);
+        return result;
     }
 }

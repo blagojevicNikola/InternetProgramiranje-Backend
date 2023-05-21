@@ -10,6 +10,7 @@ import java.util.List;
 public interface ArticleEntityRepository extends JpaRepository<ArticleEntity, Integer> {
     Slice<ArticleEntity> findArticleEntitiesByArticleTypeNameAndDeleted(String name, Boolean deleted, Pageable pageable);
     List<ArticleEntity> findArticleEntitiesByUserLocationId(Integer id);
+    ArticleEntity findArticleEntityByIdAndDeletedAndUserPersonUsername(Integer id, Boolean deleted, String username);
     Slice<ArticleEntity> findArticleEntitiesByDeletedAndSold(Boolean deleted, Boolean sold, Pageable pageable);
     Slice<ArticleEntity> findArticleEntitiesByDeletedAndSoldAndUserPersonUsername(Boolean deleted, Boolean sold, String username, Pageable pageable);
 }
