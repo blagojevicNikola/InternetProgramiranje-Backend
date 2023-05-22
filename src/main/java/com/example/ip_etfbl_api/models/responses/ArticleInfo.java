@@ -14,8 +14,11 @@ public class ArticleInfo {
     private BigDecimal price;
     private Timestamp date;
     private Boolean isNew;
+    private Integer articleTypeId;
+    private String articleTypeName;
     private User user;
     private List<Comment> comments;
     private List<Attribute> attributes;
     private List<Photo> photos;
+
 }
