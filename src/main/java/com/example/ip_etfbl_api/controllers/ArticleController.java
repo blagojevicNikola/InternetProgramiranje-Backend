@@ -45,19 +45,19 @@ public class ArticleController extends CrudController<Integer, Article, Article>
 
     @GetMapping("/type/{name}")
     public Slice<Article> getArticlesByArticleTypeName(@PathVariable String name, @RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
-                                                       @RequestParam(value = "pageSize", defaultValue = "6", required = false) int pageSize) {
+                                                       @RequestParam(value = "pageSize", defaultValue = "8", required = false) int pageSize) {
         return service.findAllByArticleTypeName(Article.class, name, pageNo, pageSize);
     }
 
     @GetMapping("/active/user/{name}")
     public Slice<Article> getActiveArticlesByUser(@PathVariable String name, @RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
-                                                  @RequestParam(value = "pageSize", defaultValue = "6", required = false) int pageSize) {
+                                                  @RequestParam(value = "pageSize", defaultValue = "8", required = false) int pageSize) {
         return service.findAllByDeletedAndSoldAndUsername(Article.class, false, false, name, pageNo, pageSize);
     }
 
     @GetMapping("/sold/user/{name}")
     public Slice<Article> getSoldArticlesByUser(@PathVariable String name, @RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
-                                                @RequestParam(value = "pageSize", defaultValue = "6", required = false) int pageSize) {
+                                                @RequestParam(value = "pageSize", defaultValue = "8", required = false) int pageSize) {
         return service.findAllByDeletedAndSoldAndUsername(Article.class, false, true, name, pageNo, pageSize);
     }
 
@@ -68,7 +68,7 @@ public class ArticleController extends CrudController<Integer, Article, Article>
 
     @GetMapping("/all")
     public Slice<Article> getAllArticles(@RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
-                                         @RequestParam(value = "pageSize", defaultValue = "6", required = false) int pageSize) {
+                                         @RequestParam(value = "pageSize", defaultValue = "8", required = false) int pageSize) {
         return service.findAllByDeletedAndSold(Article.class, false, false, pageNo, pageSize);
     }
 
@@ -81,7 +81,7 @@ public class ArticleController extends CrudController<Integer, Article, Article>
         return ResponseEntity.status(409).body(null);
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping(value="/update/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ArticleInfo> updateArticle(@PathVariable("id") int id,
                                                      @RequestPart NewArticleRequest newArticle,
                                                      @RequestPart Optional<List<MultipartFile>> newPhotos,

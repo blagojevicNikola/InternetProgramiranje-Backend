@@ -8,13 +8,11 @@ import com.example.ip_etfbl_api.models.requests.NewArticleRequest;
 import com.example.ip_etfbl_api.models.responses.ArticleInfo;
 import com.example.ip_etfbl_api.models.responses.Comment;
 import com.example.ip_etfbl_api.models.responses.User;
-import com.example.ip_etfbl_api.repositories.ArticleEntityRepository;
-import com.example.ip_etfbl_api.repositories.ArticleTypeRepository;
-import com.example.ip_etfbl_api.repositories.UserCommentsArticleEntityRepository;
-import com.example.ip_etfbl_api.repositories.UserEntityRepository;
+import com.example.ip_etfbl_api.repositories.*;
 import com.example.ip_etfbl_api.services.ArticleService;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -33,18 +31,22 @@ public class ArticleServiceImpl extends CrudJpaService<ArticleEntity, Integer> i
     private final ArticleEntityRepository articleEntityRepository;
     private final ArticleTypeRepository articleTypeRepository;
     private final UserEntityRepository userEntityRepository;
+    private final PhotoEntityRepository photoEntityRepository;
+    private final AttributeEntityRepository attributeEntityRepository;
     private final UserCommentsArticleEntityRepository userCommentsArticleEntityRepository;
-    public ArticleServiceImpl(ModelMapper modelMapper, ArticleEntityRepository articleEntityRepository, ArticleTypeRepository articleTypeRepository, UserEntityRepository userEntityRepository, UserCommentsArticleEntityRepository userCommentsArticleEntityRepository) {
+    public ArticleServiceImpl(ModelMapper modelMapper, ArticleEntityRepository articleEntityRepository, ArticleTypeRepository articleTypeRepository, UserEntityRepository userEntityRepository, PhotoEntityRepository photoEntityRepository, AttributeEntityRepository attributeEntityRepository, UserCommentsArticleEntityRepository userCommentsArticleEntityRepository) {
         super(articleEntityRepository, ArticleEntity.class , modelMapper);
         this.articleEntityRepository = articleEntityRepository;
         this.articleTypeRepository = articleTypeRepository;
         this.userEntityRepository = userEntityRepository;
+        this.photoEntityRepository = photoEntityRepository;
+        this.attributeEntityRepository = attributeEntityRepository;
         this.userCommentsArticleEntityRepository = userCommentsArticleEntityRepository;
     }
     @Override
-    public <T> Slice<T> findAllByArticleTypeName(Class<T> resultDto, String name, int pageNo, int pageSize)
+    public <T> Page<T> findAllByArticleTypeName(Class<T> resultDto, String name, int pageNo, int pageSize)
     {
-        Slice<ArticleEntity> tempSlice = articleEntityRepository.findArticleEntitiesByArticleTypeNameAndDeleted(name, false, PageRequest.of(pageNo,pageSize));
+        Page<ArticleEntity> tempSlice = articleEntityRepository.findArticleEntitiesByArticleTypeNameAndDeleted(name, false, PageRequest.of(pageNo,pageSize));
         return tempSlice.map(m -> this.getModelMapper().map(m, resultDto));
     }
 
@@ -90,8 +92,8 @@ public class ArticleServiceImpl extends CrudJpaService<ArticleEntity, Integer> i
     }
 
     @Override
-    public <T> Slice<T> findAllByDeletedAndSold(Class<T> resultDto, Boolean deleted, Boolean sold, int pageNo, int pageSize) {
-        Slice<ArticleEntity> tempSlice = articleEntityRepository.findArticleEntitiesByDeletedAndSold(deleted,sold, PageRequest.of(pageNo, pageSize));
+    public <T> Page<T> findAllByDeletedAndSold(Class<T> resultDto, Boolean deleted, Boolean sold, int pageNo, int pageSize) {
+        Page<ArticleEntity> tempSlice = articleEntityRepository.findArticleEntitiesByDeletedAndSold(deleted,sold, PageRequest.of(pageNo, pageSize));
         return tempSlice.map(m -> this.getModelMapper().map(m, resultDto));
     }
 
@@ -120,7 +122,8 @@ public class ArticleServiceImpl extends CrudJpaService<ArticleEntity, Integer> i
         toBeUpdated.setDetails(request.getDetails());
         toBeUpdated.setNew(request.getIsNew());
         toBeUpdated.setArticleType(type.get());
-        this.setAttributesInArticle(toBeUpdated, request.getAttributes());
+        this.updateAttributes(request.getAttributes(), toBeUpdated);
+        this.deleteMissingPhotos(toBeUpdated,photos);
         this.setPhotosInArticle(toBeUpdated, photos);
         ArticleEntity e = this.articleEntityRepository.save(toBeUpdated);
         return Optional.of(this.getModelMapper().map(e, ArticleInfo.class));
@@ -128,8 +131,8 @@ public class ArticleServiceImpl extends CrudJpaService<ArticleEntity, Integer> i
 
 
     @Override
-    public <T> Slice<T> findAllByDeletedAndSoldAndUsername(Class<T> resultDto, Boolean deleted, Boolean sold, String username, int pageNo, int pageSize) {
-        Slice<ArticleEntity> tempSlice = articleEntityRepository.findArticleEntitiesByDeletedAndSoldAndUserPersonUsername(deleted, sold, username, PageRequest.of(pageNo, pageSize));
+    public <T> Page<T> findAllByDeletedAndSoldAndUsername(Class<T> resultDto, Boolean deleted, Boolean sold, String username, int pageNo, int pageSize) {
+        Page<ArticleEntity> tempSlice = articleEntityRepository.findArticleEntitiesByDeletedAndSoldAndUserPersonUsername(deleted, sold, username, PageRequest.of(pageNo, pageSize));
         return tempSlice.map(m -> this.getModelMapper().map(m, resultDto));
     }
 
@@ -141,6 +144,7 @@ public class ArticleServiceImpl extends CrudJpaService<ArticleEntity, Integer> i
             for(AttributeRequest a : attributesRequest)
             {
                 AttributeEntity tmp = new AttributeEntity();
+                tmp.setId(a.getId());
                 tmp.setValue(a.getValue());
                 tmp.setName(a.getName());
                 tmp.setArticle(article);
@@ -165,5 +169,37 @@ public class ArticleServiceImpl extends CrudJpaService<ArticleEntity, Integer> i
         article.setPhotos(photos);
     }
 
+    private void deleteMissingPhotos(ArticleEntity article, List<String> photos)
+    {
+        List<PhotoEntity> toDelete = article.getPhotos().stream().filter(a -> !photos.contains(a.getUrl())).toList();
+        toDelete.forEach(t -> {
+            article.getPhotos().remove(t);
+            this.photoEntityRepository.deleteById(t.getId());
+        });
+    }
+
+    private void updateAttributes(List<AttributeRequest> attributes, ArticleEntity article)
+    {
+        List<AttributeEntity> toAdd = article.getAttributes();
+        toAdd.forEach(old -> {
+            if(attributes.stream().noneMatch(nev -> old.getName().equals(nev.getName())))
+            {
+                toAdd.remove(old);
+                this.attributeEntityRepository.deleteAttributeEntityByArticleIdAndName(article.getId(), old.getName());
+            }
+        });
+        attributes.forEach(s ->{
+           Optional<AttributeEntity> tmp = article.getAttributes().stream().filter(a -> s.getName().equals(a.getName())).findFirst();
+           tmp.ifPresentOrElse(m -> m.setValue(s.getValue()),
+                   () -> {
+               AttributeEntity tmpAttribute = new AttributeEntity();
+               tmpAttribute.setName(s.getName());
+               tmpAttribute.setValue(s.getValue());
+               tmpAttribute.setArticle(article);
+               toAdd.add(tmpAttribute);
+           });
+        });
+        article.setAttributes(toAdd);
+    }
 
 }

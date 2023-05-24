@@ -6,6 +6,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AttributeRequest {
+    private Integer id;
     private String name;
     private String value;
 }

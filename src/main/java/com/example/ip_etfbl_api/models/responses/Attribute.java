@@ -7,6 +7,7 @@ import lombok.ToString;
 
 @Data
 public class Attribute {
+    private Integer id;
     private String name;
     private String value;
 }
