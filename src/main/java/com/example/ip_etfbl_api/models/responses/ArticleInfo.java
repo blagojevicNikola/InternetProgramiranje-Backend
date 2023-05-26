@@ -17,6 +17,7 @@ public class ArticleInfo {
     private Integer articleTypeId;
     private String articleTypeName;
     private User user;
+    private Boolean sold;
     private List<Comment> comments;
     private List<Attribute> attributes;
     private List<Photo> photos;

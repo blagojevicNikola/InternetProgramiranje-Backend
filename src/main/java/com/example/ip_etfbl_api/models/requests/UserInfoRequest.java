@@ -8,5 +8,5 @@ public class UserInfoRequest {
     private String username;
     private String surname;
     private String phoneNumber;
-    private Integer locationId;
+    private Integer userLocationId;
 }

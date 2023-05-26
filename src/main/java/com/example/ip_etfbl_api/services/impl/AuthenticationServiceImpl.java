@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 @Transactional
 public class AuthenticationServiceImpl implements AuthenticationService {
     private final PersonEntityRepository personEntityRepository;
-    private final UserEntityRepository userEntityRepository;
     private final LocationEntityRepository locationEntityRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
@@ -29,7 +28,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     public AuthenticationServiceImpl(PersonEntityRepository personEntityRepository, UserEntityRepository userEntityRepository, LocationEntityRepository locationEntityRepository, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager) {
         this.personEntityRepository = personEntityRepository;
-        this.userEntityRepository = userEntityRepository;
         this.locationEntityRepository = locationEntityRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;

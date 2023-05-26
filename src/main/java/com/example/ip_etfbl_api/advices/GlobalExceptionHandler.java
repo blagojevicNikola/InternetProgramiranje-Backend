@@ -7,6 +7,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -46,6 +47,14 @@ public class GlobalExceptionHandler {
         LoggingUtil.logException(e, getLog(handlerMethod));
         return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public final ResponseEntity<Object> handleBadCredentialsException(BadCredentialsException e, HandlerMethod handlerMethod)
+    {
+        LoggingUtil.logException(e, getLog(handlerMethod));
+        return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+    }
+
 
     private Log getLog(HandlerMethod handlerMethod)
     {

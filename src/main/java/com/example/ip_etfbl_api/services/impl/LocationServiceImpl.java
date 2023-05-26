@@ -3,6 +3,7 @@ package com.example.ip_etfbl_api.services.impl;
 import com.example.ip_etfbl_api.base.CrudJpaService;
 import com.example.ip_etfbl_api.exceptions.NotFoundException;
 import com.example.ip_etfbl_api.models.entities.LocationEntity;
+import com.example.ip_etfbl_api.models.responses.Location;
 import com.example.ip_etfbl_api.repositories.LocationEntityRepository;
 import com.example.ip_etfbl_api.services.LocationService;
 import jakarta.transaction.Transactional;

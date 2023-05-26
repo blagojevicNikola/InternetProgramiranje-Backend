@@ -7,7 +7,7 @@ import lombok.*;
 public class User {
     private Integer id;
     private String username;
-    private String locationName;
+    private String userLocationName;
 
     public User()
     {}
@@ -15,6 +15,6 @@ public class User {
     {
         this.id = id;
         this.username = username;
-        this.locationName = locationName;
+        this.userLocationName = locationName;
     }
 }
