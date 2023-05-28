@@ -29,10 +29,10 @@ public class WebSecurityConfig{
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http = http.cors().and().csrf().disable().authorizeHttpRequests()
                 .requestMatchers(HttpMethod.DELETE, "/articles/delete/{id}").authenticated()
-                .requestMatchers(HttpMethod.POST, "/articles/create").authenticated()
+                .requestMatchers(HttpMethod.POST, "/articles/create", "/messages/user").authenticated()
                 .requestMatchers(HttpMethod.PUT, "/articles/update/{id}", "/users/update/**").authenticated()
                 .requestMatchers(HttpMethod.GET, "/messages/user").authenticated()
-                .requestMatchers("/auth/**", "/articles/all", "/articles/sold/**", "/articles/active/**", "/articles/info/**", "/articles/type/**", "/article-types/**", "/users/**", "/attribute/**", "/locations")
+                .requestMatchers("/articles/just-test/{name}", "/auth/**", "/articles/all", "/articles/sold/**", "/articles/active/**", "/articles/info/**", "/articles/type/**", "/article-types/**", "/users/**", "/attribute/**", "/locations")
                 .permitAll()
                 .anyRequest()
                 .authenticated()

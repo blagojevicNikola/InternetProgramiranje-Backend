@@ -3,10 +3,7 @@ package com.example.ip_etfbl_api.controllers;
 import com.example.ip_etfbl_api.models.responses.Message;
 import com.example.ip_etfbl_api.services.MessageService;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -25,5 +22,12 @@ public class MessageController {
     {
         return this.messageService.getMessagesFromUser(authentication.getName());
     }
+
+    @PostMapping("/send")
+    public Message sendMessage(@RequestBody String content, Authentication authentication)
+    {
+        return this.messageService.sendMessage(content, authentication.getName());
+    }
+
 
 }

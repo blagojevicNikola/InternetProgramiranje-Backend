@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -45,8 +46,19 @@ public class ArticleController extends CrudController<Integer, Article, Article>
 
     @GetMapping("/type/{name}")
     public Slice<Article> getArticlesByArticleTypeName(@PathVariable String name, @RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
-                                                       @RequestParam(value = "pageSize", defaultValue = "8", required = false) int pageSize) {
-        return service.findAllByArticleTypeName(Article.class, name, pageNo, pageSize);
+                                                       @RequestParam(value = "pageSize", defaultValue = "8", required = false) int pageSize,
+                                                       @RequestParam Map<String,String> allParams) {
+        allParams.remove("pageNo");
+        allParams.remove("pageSize");
+        return this.service.findAllActiveArticlesByTypeAndAttributes(Article.class, allParams, name, pageNo, pageSize);
+    }
+
+    @GetMapping("/just-test/{name}")
+    public Slice<Article> test(@PathVariable String name, @RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
+                                     @RequestParam(value = "pageSize", defaultValue = "8", required = false) int pageSize,
+                                     @RequestParam Map<String,String> allParams)
+    {
+        return null;
     }
 
     @GetMapping("/active/user/{name}")

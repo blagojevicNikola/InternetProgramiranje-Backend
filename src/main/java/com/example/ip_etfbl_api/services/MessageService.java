@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface MessageService{
     List<Message> getMessagesFromUser(String username);
+    Message sendMessage(String content, String username);
 }

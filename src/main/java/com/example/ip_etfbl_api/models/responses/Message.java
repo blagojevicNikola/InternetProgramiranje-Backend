@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class Message {
-    public String userUsername;
+    public String userPersonUsername;
     public String dateTime;
     public String content;
     public Boolean seen;

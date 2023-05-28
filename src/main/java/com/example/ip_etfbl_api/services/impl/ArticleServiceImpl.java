@@ -17,10 +17,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -127,6 +129,31 @@ public class ArticleServiceImpl extends CrudJpaService<ArticleEntity, Integer> i
         this.setPhotosInArticle(toBeUpdated, photos);
         ArticleEntity e = this.articleEntityRepository.save(toBeUpdated);
         return Optional.of(this.getModelMapper().map(e, ArticleInfo.class));
+    }
+
+    @Override
+    public <T> Page<T> findAllActiveArticlesByTypeAndAttributes(Class<T> resultDto, Map<String, String> params, String typeName, int pageNo, int pageSize) {
+        params.entrySet().removeIf(entry -> entry.getValue().isEmpty());
+        String search=params.remove("q");
+        String location = params.remove("location_id");
+        Integer locationId= location==null ? null : Integer.valueOf(location);
+        String pf = params.remove("priceFrom");
+        String pt = params.remove("priceTo");
+        BigDecimal priceFrom = pf==null ? null : BigDecimal.valueOf(Double.parseDouble(params.remove("priceFrom")));
+        BigDecimal priceTo = pt==null ? null : BigDecimal.valueOf(Double.parseDouble(params.remove("priceTo")));
+        List<String> values = new ArrayList<>();
+        List<String> names = new ArrayList<>();
+        params.forEach((k,v) -> {if(!v.isEmpty())
+        {
+            names.add(k);
+            System.out.println(k);
+            values.add(v);
+            System.out.println(v);
+        }
+        });
+        Page<ArticleEntity> tmpSlice = this.articleEntityRepository.findArticleEntitiesWithQuery(false, false, locationId, search, priceFrom, priceTo,typeName
+                , names, values, names.size(), values.size(), PageRequest.of(pageNo, pageSize));
+        return tmpSlice.map(a -> this.getModelMapper().map(a, resultDto));
     }
 
 
