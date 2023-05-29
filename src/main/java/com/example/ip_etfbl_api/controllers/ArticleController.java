@@ -7,6 +7,7 @@ import com.example.ip_etfbl_api.models.responses.ArticleInfo;
 import com.example.ip_etfbl_api.services.ArticleService;
 import com.example.ip_etfbl_api.services.PhotoService;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -47,17 +48,23 @@ public class ArticleController extends CrudController<Integer, Article, Article>
     @GetMapping("/type/{name}")
     public Slice<Article> getArticlesByArticleTypeName(@PathVariable String name, @RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
                                                        @RequestParam(value = "pageSize", defaultValue = "8", required = false) int pageSize,
-                                                       @RequestParam Map<String,String> allParams) {
+                                                       @RequestParam Map<String,String> allParams,
+                                                       @RequestParam(value="sort", required = false)String sort) {
         allParams.remove("pageNo");
         allParams.remove("pageSize");
-        return this.service.findAllActiveArticlesByTypeAndAttributes(Article.class, allParams, name, pageNo, pageSize);
+        allParams.remove("sort");
+        Sort sortOrder = this.getArticleSortOrder(sort);
+        return this.service.findAllActiveArticlesByTypeAndAttributes(Article.class, allParams, name, pageNo, pageSize, sortOrder);
     }
 
     @GetMapping("/just-test/{name}")
     public Slice<Article> test(@PathVariable String name, @RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
                                      @RequestParam(value = "pageSize", defaultValue = "8", required = false) int pageSize,
-                                     @RequestParam Map<String,String> allParams)
+                                     @RequestParam Map<String,String> allParams, @RequestParam(name="sort", required = false) String sort)
     {
+
+        System.out.println(allParams);
+        System.out.println(sort);
         return null;
     }
 
@@ -80,8 +87,15 @@ public class ArticleController extends CrudController<Integer, Article, Article>
 
     @GetMapping("/all")
     public Slice<Article> getAllArticles(@RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
-                                         @RequestParam(value = "pageSize", defaultValue = "8", required = false) int pageSize) {
-        return service.findAllByDeletedAndSold(Article.class, false, false, pageNo, pageSize);
+                                         @RequestParam(value = "pageSize", defaultValue = "8", required = false) int pageSize,
+                                         @RequestParam Map<String,String> allParams,
+                                         @RequestParam(value="sort", required = false)String sort) {
+        //return service.findAllByDeletedAndSold(Article.class, false, false, pageNo, pageSize);
+        allParams.remove("pageNo");
+        allParams.remove("pageSize");
+        allParams.remove("sort");
+        Sort sortOrder = this.getArticleSortOrder(sort);
+        return this.service.findAllActiveArticlesByAttributes(Article.class, allParams, pageNo, pageSize, sortOrder);
     }
 
     @DeleteMapping("/delete/{id}")
@@ -117,5 +131,26 @@ public class ArticleController extends CrudController<Integer, Article, Article>
         }
         existingPhotos.ifPresent(result::addAll);
         return result;
+    }
+
+    private Sort getArticleSortOrder(String sort)
+    {
+        Sort defaultSort = Sort.by(Sort.Order.desc("date"));
+        if(sort==null)
+        {
+            return defaultSort;
+        }
+        if(!sort.matches("^(date|price),(asc|desc)$"))
+        {
+            return defaultSort;
+        }
+        String[] data = sort.split(",");
+        if(data[1].equals("desc"))
+        {
+            return Sort.by(Sort.Order.desc(data[0]));
+        }
+        else {
+            return Sort.by(Sort.Order.asc(data[0]));
+        }
     }
 }

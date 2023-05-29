@@ -15,6 +15,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -132,27 +133,50 @@ public class ArticleServiceImpl extends CrudJpaService<ArticleEntity, Integer> i
     }
 
     @Override
-    public <T> Page<T> findAllActiveArticlesByTypeAndAttributes(Class<T> resultDto, Map<String, String> params, String typeName, int pageNo, int pageSize) {
+    public <T> Page<T> findAllActiveArticlesByAttributes(Class<T> resultDto, Map<String, String> params, int pageNo, int pageSize, Sort sort) {
         params.entrySet().removeIf(entry -> entry.getValue().isEmpty());
         String search=params.remove("q");
         String location = params.remove("location_id");
         Integer locationId= location==null ? null : Integer.valueOf(location);
         String pf = params.remove("priceFrom");
         String pt = params.remove("priceTo");
-        BigDecimal priceFrom = pf==null ? null : BigDecimal.valueOf(Double.parseDouble(params.remove("priceFrom")));
-        BigDecimal priceTo = pt==null ? null : BigDecimal.valueOf(Double.parseDouble(params.remove("priceTo")));
+        BigDecimal priceFrom = pf==null ? null : BigDecimal.valueOf(Double.parseDouble(pf));
+        BigDecimal priceTo = pt==null ? null : BigDecimal.valueOf(Double.parseDouble(pt));
         List<String> values = new ArrayList<>();
         List<String> names = new ArrayList<>();
         params.forEach((k,v) -> {if(!v.isEmpty())
         {
             names.add(k);
-            System.out.println(k);
             values.add(v);
-            System.out.println(v);
         }
         });
-        Page<ArticleEntity> tmpSlice = this.articleEntityRepository.findArticleEntitiesWithQuery(false, false, locationId, search, priceFrom, priceTo,typeName
-                , names, values, names.size(), values.size(), PageRequest.of(pageNo, pageSize));
+
+        Page<ArticleEntity> tmpSlice = this.articleEntityRepository.findAllArticleEntitiesWithQuery(false, false, locationId, search, priceFrom, priceTo
+                , names, values, names.size(), values.size(), PageRequest.of(pageNo, pageSize,sort));
+        return tmpSlice.map(a -> this.getModelMapper().map(a, resultDto));
+    }
+
+    @Override
+    public <T> Page<T> findAllActiveArticlesByTypeAndAttributes(Class<T> resultDto, Map<String, String> params, String typeName, int pageNo, int pageSize, Sort sort) {
+        params.entrySet().removeIf(entry -> entry.getValue().isEmpty());
+        String search=params.remove("q");
+        String location = params.remove("location_id");
+        Integer locationId= location==null ? null : Integer.valueOf(location);
+        String pf = params.remove("priceFrom");
+        String pt = params.remove("priceTo");
+        BigDecimal priceFrom = pf==null ? null : BigDecimal.valueOf(Double.parseDouble(pf));
+        BigDecimal priceTo = pt==null ? null : BigDecimal.valueOf(Double.parseDouble(pt));
+        List<String> values = new ArrayList<>();
+        List<String> names = new ArrayList<>();
+        params.forEach((k,v) -> {if(!v.isEmpty())
+        {
+            names.add(k);
+            values.add(v);
+        }
+        });
+
+        Page<ArticleEntity> tmpSlice = this.articleEntityRepository.findArticleEntitiesByTypeWithQuery(false, false, locationId, search, priceFrom, priceTo,typeName
+                , names, values, names.size(), values.size(), PageRequest.of(pageNo, pageSize,sort));
         return tmpSlice.map(a -> this.getModelMapper().map(a, resultDto));
     }
 

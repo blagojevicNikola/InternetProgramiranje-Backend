@@ -3,6 +3,7 @@ package com.example.ip_etfbl_api.models.responses;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 
 @Data
 public class Article {
@@ -13,4 +14,5 @@ public class Article {
     private Boolean isNew;
     private Boolean sold;
     private String photoUrl;
+    private Timestamp date;
 }

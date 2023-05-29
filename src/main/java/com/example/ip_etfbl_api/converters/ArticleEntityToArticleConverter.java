@@ -21,6 +21,7 @@ public class ArticleEntityToArticleConverter implements Converter<ArticleEntity,
         destination.setPrice(source.getPrice());
         destination.setDetails(source.getDetails());
         destination.setIsNew(source.getIsNew());
+        destination.setDate(source.getDate());
 
         if(source.getPhotos()!=null && !source.getPhotos().isEmpty())
         {
