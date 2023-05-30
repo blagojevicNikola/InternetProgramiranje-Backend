@@ -87,7 +87,7 @@ public class ArticleController extends CrudController<Integer, Article, Article>
 
     @GetMapping("/all")
     public Slice<Article> getAllArticles(@RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
-                                         @RequestParam(value = "pageSize", defaultValue = "8", required = false) int pageSize,
+                                         @RequestParam(value = "pageSize", defaultValue = "6", required = false) int pageSize,
                                          @RequestParam Map<String,String> allParams,
                                          @RequestParam(value="sort", required = false)String sort) {
         //return service.findAllByDeletedAndSold(Article.class, false, false, pageNo, pageSize);

@@ -4,63 +4,58 @@ import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.Objects;
 
+@NoArgsConstructor
+@Data
 public class OptionsEntityPK implements Serializable {
 
     @Column(name = "value", nullable = false, length = 100)
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer value;
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
+    private String value;
 
     @Column(name = "structure_name", nullable = false)
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer structureName;
-
-    private Integer structureTypeId;
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
+    private String structureName;
     @Column(name = "article_type_id", nullable = false)
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer articleTypeId;
 
-    public Integer getValue() {
+    public String getValue() {
         return value;
     }
 
-    public void setValue(Integer value) {
+    public void setValue(String value) {
         this.value = value;
     }
 
-    public Integer getStructureName() {
+    public String getStructureName() {
         return structureName;
     }
 
-    public void setStructureName(Integer structureName) {
+    public void setStructureName(String structureName) {
         this.structureName = structureName;
     }
 
-    public Integer getStructureTypeId() {
-        return structureTypeId;
-    }
-
-    public void setStructureTypeId(Integer structureTypeId) {
-        this.structureTypeId = structureTypeId;
-    }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         OptionsEntityPK that = (OptionsEntityPK) o;
-        return Objects.equals(value, that.value) && Objects.equals(structureName, that.structureName) && Objects.equals(structureTypeId, that.structureTypeId);
+        return Objects.equals(value, that.value) && Objects.equals(structureName, that.structureName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(value, structureName, structureTypeId);
+        return Objects.hash(value, structureName);
     }
 
     public Integer getArticleTypeId() {

@@ -10,29 +10,22 @@ import java.util.Objects;
 @Table(name = "options", schema = "etfbl_ip", catalog = "")
 @IdClass(OptionsEntityPK.class)
 public class OptionsEntity {
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "value", nullable = false, length = 100)
-    private Integer value;
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private String value;
+   // @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "structure_name", nullable = false)
-    private Integer structureName;
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Id
-    @Column(name = "structure_type_id", nullable = false)
-    private Integer structureTypeId;
+    private String structureName;
     @ManyToOne
     //@JoinColumns({@JoinColumn(name = "structure_name", referencedColumnName = "name", nullable = false, insertable =  false, updatable = false), @JoinColumn(name = "structure_type_id", referencedColumnName = "article_type_id", nullable = false, insertable =  false, updatable = false)})
     @JoinColumns({@JoinColumn(name = "structure_name", referencedColumnName = "name", nullable = false, insertable = false, updatable = false), @JoinColumn(name = "article_type_id", referencedColumnName = "article_type_id", nullable = false, insertable = false,updatable = false)})
     private AttributeStructureEntity attributeStructure;
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "article_type_id", nullable = false)
     private Integer articleTypeId;
 
-    public void setValue(Integer value) {
-        this.value = value;
-    }
 
 }
