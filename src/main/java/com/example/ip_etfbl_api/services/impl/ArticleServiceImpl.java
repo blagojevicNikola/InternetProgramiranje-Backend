@@ -156,6 +156,8 @@ public class ArticleServiceImpl extends CrudJpaService<ArticleEntity, Integer> i
         return tmpSlice.map(a -> this.getModelMapper().map(a, resultDto));
     }
 
+
+
     @Override
     public <T> Page<T> findAllActiveArticlesByTypeAndAttributes(Class<T> resultDto, Map<String, String> params, String typeName, int pageNo, int pageSize, Sort sort) {
         params.entrySet().removeIf(entry -> entry.getValue().isEmpty());
@@ -176,6 +178,30 @@ public class ArticleServiceImpl extends CrudJpaService<ArticleEntity, Integer> i
         });
 
         Page<ArticleEntity> tmpSlice = this.articleEntityRepository.findArticleEntitiesByTypeWithQuery(false, false, locationId, search, priceFrom, priceTo,typeName
+                , names, values, names.size(), values.size(), PageRequest.of(pageNo, pageSize,sort));
+        return tmpSlice.map(a -> this.getModelMapper().map(a, resultDto));
+    }
+
+    @Override
+    public <T> Page<T> findArticlesWithQueries(Class<T> resultDto, Map<String, String> params, Integer typeId, int pageNo, int pageSize, Sort sort) {
+        params.entrySet().removeIf(entry -> entry.getValue().isEmpty());
+        String search=params.remove("q");
+        String location = params.remove("location_id");
+        Integer locationId= location==null ? null : Integer.valueOf(location);
+        String pf = params.remove("priceFrom");
+        String pt = params.remove("priceTo");
+        BigDecimal priceFrom = pf==null ? null : BigDecimal.valueOf(Double.parseDouble(pf));
+        BigDecimal priceTo = pt==null ? null : BigDecimal.valueOf(Double.parseDouble(pt));
+        List<String> values = new ArrayList<>();
+        List<String> names = new ArrayList<>();
+        params.forEach((k,v) -> {if(!v.isEmpty())
+        {
+            names.add(k);
+            values.add(v);
+        }
+        });
+
+        Page<ArticleEntity> tmpSlice = this.articleEntityRepository.findArticleEntitiesByTypeIdWithQuery(false, false, locationId, search, priceFrom, priceTo,typeId
                 , names, values, names.size(), values.size(), PageRequest.of(pageNo, pageSize,sort));
         return tmpSlice.map(a -> this.getModelMapper().map(a, resultDto));
     }

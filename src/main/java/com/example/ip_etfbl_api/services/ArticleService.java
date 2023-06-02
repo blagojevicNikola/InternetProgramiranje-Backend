@@ -22,5 +22,6 @@ public interface ArticleService extends CrudService<Integer> {
     Optional<ArticleInfo> updateArticle(Integer id, NewArticleRequest request, List<String> photos, String username);
     <T> Page<T> findAllActiveArticlesByAttributes(Class<T> resultDto, Map<String, String> params, int pageNo, int pageSize, Sort sort);
     <T> Page<T> findAllActiveArticlesByTypeAndAttributes(Class<T> resultDto, Map<String, String> params, String typeName, int pageNo, int pageSize, Sort sort);
+    <T> Page<T> findArticlesWithQueries(Class<T> resultDto, Map<String, String> params, Integer typeId, int pageNo, int pageSize, Sort sort);
     <T> Page<T> findAllByDeletedAndSoldAndUsername(Class<T> resultDto, Boolean deleted, Boolean sold, String username, int pageNo, int pageSize);
 }

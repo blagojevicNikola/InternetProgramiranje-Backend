@@ -98,6 +98,21 @@ public class ArticleController extends CrudController<Integer, Article, Article>
         return this.service.findAllActiveArticlesByAttributes(Article.class, allParams, pageNo, pageSize, sortOrder);
     }
 
+    @GetMapping("/search")
+    public Slice<Article> searchArticles(@RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
+                                         @RequestParam(value = "pageSize", defaultValue = "6", required = false) int pageSize,
+                                         @RequestParam(value = "typeId", required = false) int typeId,
+                                         @RequestParam Map<String,String> allParams,
+                                         @RequestParam(value="sort", required = false)String sort)
+    {
+        allParams.remove("pageNo");
+        allParams.remove("pageSize");
+        allParams.remove("sort");
+        allParams.remove("typeId");
+        Sort sortOrder = this.getArticleSortOrder(sort);
+        return this.service.findArticlesWithQueries(Article.class, allParams,typeId,pageNo, pageSize, sortOrder);
+    }
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteArticle(@PathVariable("id") int id, Authentication authentication) {
         String username = authentication.getName();
