@@ -7,5 +7,8 @@ import java.util.Optional;
 
 public interface PersonEntityRepository extends JpaRepository<PersonEntity, Integer> {
     Optional<PersonEntity> findByUsername(String username);
+
+    Optional<PersonEntity> findByUsernameAndDeletedAndUserPin(String username, Boolean deleted, Integer pin);
     Boolean existsPersonEntityByUsername(String username);
+    Boolean existsPersonEntityByUsernameOrUserEmail(String username, String email);
 }

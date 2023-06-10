@@ -87,30 +87,24 @@ public class ArticleController extends CrudController<Integer, Article, Article>
 
     @GetMapping("/all")
     public Slice<Article> getAllArticles(@RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
-                                         @RequestParam(value = "pageSize", defaultValue = "6", required = false) int pageSize,
-                                         @RequestParam Map<String,String> allParams,
-                                         @RequestParam(value="sort", required = false)String sort) {
-        //return service.findAllByDeletedAndSold(Article.class, false, false, pageNo, pageSize);
-        allParams.remove("pageNo");
-        allParams.remove("pageSize");
-        allParams.remove("sort");
-        Sort sortOrder = this.getArticleSortOrder(sort);
-        return this.service.findAllActiveArticlesByAttributes(Article.class, allParams, pageNo, pageSize, sortOrder);
+                                         @RequestParam(value = "pageSize", defaultValue = "6", required = false) int pageSize) {
+        //return service.findAllByDeletedAndSold(Article.class, false, false, pageNo, pageSize
+        return this.service.findAllByDeletedAndSold(Article.class, false, false, pageNo, pageSize);
     }
 
     @GetMapping("/search")
     public Slice<Article> searchArticles(@RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
                                          @RequestParam(value = "pageSize", defaultValue = "6", required = false) int pageSize,
-                                         @RequestParam(value = "typeId", required = false) int typeId,
+                                         @RequestParam(value = "category", required = false) String category,
                                          @RequestParam Map<String,String> allParams,
                                          @RequestParam(value="sort", required = false)String sort)
     {
         allParams.remove("pageNo");
         allParams.remove("pageSize");
         allParams.remove("sort");
-        allParams.remove("typeId");
+        allParams.remove("category");
         Sort sortOrder = this.getArticleSortOrder(sort);
-        return this.service.findArticlesWithQueries(Article.class, allParams,typeId,pageNo, pageSize, sortOrder);
+        return this.service.findArticlesWithQueries(Article.class, allParams,category,pageNo, pageSize, sortOrder);
     }
 
     @DeleteMapping("/delete/{id}")
@@ -137,6 +131,18 @@ public class ArticleController extends CrudController<Integer, Article, Article>
         }
         return ResponseEntity.status(409).body(null);
     }
+
+    @PutMapping("/buy/{id}")
+    public ResponseEntity<Void> buyAnArticle(@PathVariable Integer id, Authentication authentication)
+    {
+        String username = authentication.getName();
+        if(this.service.buyAnArticle(id, username))
+        {
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.status(409).build();
+    }
+
 
     private List<String> getImagesForUpdate(Optional<List<MultipartFile>> newPhotos, Optional<List<String>> existingPhotos) throws IOException {
         List<String> result = new ArrayList<>();

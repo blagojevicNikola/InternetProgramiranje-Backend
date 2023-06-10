@@ -37,12 +37,12 @@ public class PersonEntity implements BaseEntity<Integer>, UserDetails {
     @Column(name="deleted", nullable=false)
     private Boolean deleted;
 
-    @OneToOne(cascade= CascadeType.ALL, mappedBy = "person")
+    /*@OneToOne(cascade= CascadeType.ALL, mappedBy = "person")
     @PrimaryKeyJoinColumn
     private AdminEntity admin;
     @OneToOne(cascade= CascadeType.ALL, mappedBy = "person")
     @PrimaryKeyJoinColumn
-    private SupportEntity support;
+    private SupportEntity support;*/
     @OneToOne(cascade= CascadeType.ALL, mappedBy = "person")
     @PrimaryKeyJoinColumn
     private UserEntity user;

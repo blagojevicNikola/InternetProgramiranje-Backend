@@ -29,10 +29,10 @@ public class WebSecurityConfig{
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http = http.cors().and().csrf().disable().authorizeHttpRequests()
                 .requestMatchers(HttpMethod.DELETE, "/articles/delete/{id}").authenticated()
-                .requestMatchers(HttpMethod.POST, "/articles/create", "/messages/user").authenticated()
-                .requestMatchers(HttpMethod.PUT, "/articles/update/{id}", "/users/update/**").authenticated()
+                .requestMatchers(HttpMethod.POST, "/articles/create", "/messages/user", "/comments/add/{articleId}").authenticated()
+                .requestMatchers(HttpMethod.PUT, "/articles/update/{id}", "/articles/buy/{id}", "/users/update/**").authenticated()
                 .requestMatchers(HttpMethod.GET, "/messages/user").authenticated()
-                .requestMatchers("/articles/just-test/{name}", "/auth/**", "/articles/all", "/articles/sold/**", "/articles/active/**", "/articles/info/**", "/articles/type/**", "/article-types/**", "/article-types/{name}/options", "/users/**", "/attribute/**", "/locations")
+                .requestMatchers("/articles/search", "/auth/**", "/articles/all", "/articles/sold/**", "/articles/active/**", "/articles/info/**", "/articles/type/**", "/article-types/**", "/article-types/{name}/options", "/users/**", "/attribute/**", "/locations")
                 .permitAll()
                 .anyRequest()
                 .authenticated()

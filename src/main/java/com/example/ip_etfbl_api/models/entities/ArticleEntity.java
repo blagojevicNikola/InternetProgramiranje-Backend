@@ -43,6 +43,10 @@ public class ArticleEntity implements BaseEntity<Integer> {
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "person_id", nullable = false)
     private UserEntity user;
+
+    @ManyToOne
+    @JoinColumn(name = "user_buyer_id", referencedColumnName = "person_id", nullable = true)
+    private UserEntity buyer;
     @ManyToOne
     @JoinColumn(name = "type_id", referencedColumnName = "id", nullable = false)
     private ArticleTypeEntity articleType;

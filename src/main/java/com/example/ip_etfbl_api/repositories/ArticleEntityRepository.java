@@ -11,10 +11,12 @@ import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 public interface ArticleEntityRepository extends JpaRepository<ArticleEntity, Integer> {
     Page<ArticleEntity> findArticleEntitiesByArticleTypeNameAndDeleted(String name, Boolean deleted, Pageable pageable);
     List<ArticleEntity> findArticleEntitiesByUserLocationId(Integer id);
+    Optional<ArticleEntity> findArticleEntityByIdAndDeletedAndSold(Integer id, Boolean deleted, Boolean sold);
     ArticleEntity findArticleEntityByIdAndDeletedAndUserPersonUsername(Integer id, Boolean deleted, String username);
     Page<ArticleEntity> findArticleEntitiesByDeletedAndSold(Boolean deleted, Boolean sold, Pageable pageable);
     Page<ArticleEntity> findArticleEntitiesByDeletedAndSoldAndUserPersonUsername(Boolean deleted, Boolean sold, String username, Pageable pageable);
@@ -22,6 +24,6 @@ public interface ArticleEntityRepository extends JpaRepository<ArticleEntity, In
     Page<ArticleEntity> findArticleEntitiesByTypeWithQuery(Boolean deleted, Boolean sold, Integer locationId, String search, BigDecimal priceFrom, BigDecimal priceTo, String typeName, @Param("names") List<String> names, @Param("values") List<String> values, int namesSize, int valuesSize, Pageable pageable);
     @Query("SELECT DISTINCT u FROM ArticleEntity u LEFT JOIN u.attributes attr WHERE u.deleted=:deleted and u.sold=:sold and (:locationId is null or u.user.location.id=:locationId) and (:search is null or u.title LIKE %:search%) and (:priceFrom is null or u.price >= :priceFrom) and (:priceTo is null or u.price <= :priceTo) and ((:namesSize = 0) or attr.name IN :names) and ((:valuesSize = 0) or attr.value IN :values) group by u.id having ((:namesSize=0) or count(u) = :namesSize)")
     Page<ArticleEntity> findAllArticleEntitiesWithQuery(Boolean deleted, Boolean sold, Integer locationId, String search, BigDecimal priceFrom, BigDecimal priceTo,  @Param("names") List<String> names, @Param("values") List<String> values, int namesSize, int valuesSize, Pageable pageable);
-    @Query("SELECT DISTINCT u FROM ArticleEntity u LEFT JOIN u.attributes attr WHERE u.deleted=:deleted and u.sold=:sold and (:typeId is null or u.articleType.id = :typeId) and (:locationId is null or u.user.location.id=:locationId) and (:search is null or u.title LIKE %:search%) and (:priceFrom is null or u.price >= :priceFrom) and (:priceTo is null or u.price <= :priceTo) and ((:namesSize = 0) or attr.name IN :names) and ((:valuesSize = 0) or attr.value IN :values) group by u.id having ((:namesSize=0) or count(u) = :namesSize)")
-    Page<ArticleEntity> findArticleEntitiesByTypeIdWithQuery(Boolean deleted, Boolean sold, Integer locationId, String search, BigDecimal priceFrom, BigDecimal priceTo, Integer typeId, @Param("names") List<String> names, @Param("values") List<String> values, int namesSize, int valuesSize, Pageable pageable);
+    @Query("SELECT DISTINCT u FROM ArticleEntity u LEFT JOIN u.attributes attr WHERE u.deleted=:deleted and u.sold=:sold and (:category is null or u.articleType.name LIKE :category) and (:locationId is null or u.user.location.id=:locationId) and (:search is null or u.title LIKE %:search%) and (:priceFrom is null or u.price >= :priceFrom) and (:priceTo is null or u.price <= :priceTo) and ((:namesSize = 0) or attr.name IN :names) and ((:valuesSize = 0) or attr.value IN :values) group by u.id having ((:namesSize=0) or count(u) = :namesSize)")
+    Page<ArticleEntity> findArticleEntitiesByTypeIdWithQuery(Boolean deleted, Boolean sold, Integer locationId, String search, BigDecimal priceFrom, BigDecimal priceTo, String category, @Param("names") List<String> names, @Param("values") List<String> values, int namesSize, int valuesSize, Pageable pageable);
 }

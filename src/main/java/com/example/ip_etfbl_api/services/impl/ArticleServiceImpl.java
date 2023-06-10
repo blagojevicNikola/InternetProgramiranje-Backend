@@ -63,7 +63,7 @@ public class ArticleServiceImpl extends CrudJpaService<ArticleEntity, Integer> i
         if(user.isEmpty())
             throw new NotFoundException();
         UserEntity userTmp = user.get();
-        List<UserCommentsArticleEntity> comments = userCommentsArticleEntityRepository.findUserCommentsArticleEntitiesByArticleIdAndUserId(articleTmp.getId(), userTmp.getId());
+        List<UserCommentsArticleEntity> comments = userCommentsArticleEntityRepository.findUserCommentsArticleEntitiesByArticleId(articleTmp.getId());
         ArticleInfo result = getModelMapper().map(articleTmp, ArticleInfo.class);
         result.setUser(new User(userTmp.getId(), userTmp.getPerson().getUsername(), userTmp.getLocation().getName()));
         result.setComments(comments.stream().map(m -> getModelMapper().map(m, Comment.class)).collect(Collectors.toList()));
@@ -183,7 +183,7 @@ public class ArticleServiceImpl extends CrudJpaService<ArticleEntity, Integer> i
     }
 
     @Override
-    public <T> Page<T> findArticlesWithQueries(Class<T> resultDto, Map<String, String> params, Integer typeId, int pageNo, int pageSize, Sort sort) {
+    public <T> Page<T> findArticlesWithQueries(Class<T> resultDto, Map<String, String> params, String category, int pageNo, int pageSize, Sort sort) {
         params.entrySet().removeIf(entry -> entry.getValue().isEmpty());
         String search=params.remove("q");
         String location = params.remove("location_id");
@@ -201,7 +201,7 @@ public class ArticleServiceImpl extends CrudJpaService<ArticleEntity, Integer> i
         }
         });
 
-        Page<ArticleEntity> tmpSlice = this.articleEntityRepository.findArticleEntitiesByTypeIdWithQuery(false, false, locationId, search, priceFrom, priceTo,typeId
+        Page<ArticleEntity> tmpSlice = this.articleEntityRepository.findArticleEntitiesByTypeIdWithQuery(false, false, locationId, search, priceFrom, priceTo,category
                 , names, values, names.size(), values.size(), PageRequest.of(pageNo, pageSize,sort));
         return tmpSlice.map(a -> this.getModelMapper().map(a, resultDto));
     }
@@ -211,6 +211,24 @@ public class ArticleServiceImpl extends CrudJpaService<ArticleEntity, Integer> i
     public <T> Page<T> findAllByDeletedAndSoldAndUsername(Class<T> resultDto, Boolean deleted, Boolean sold, String username, int pageNo, int pageSize) {
         Page<ArticleEntity> tempSlice = articleEntityRepository.findArticleEntitiesByDeletedAndSoldAndUserPersonUsername(deleted, sold, username, PageRequest.of(pageNo, pageSize));
         return tempSlice.map(m -> this.getModelMapper().map(m, resultDto));
+    }
+
+    @Override
+    public Boolean buyAnArticle(Integer articleId, String buyerUsername) {
+
+        Optional<UserEntity> buyer = this.userEntityRepository.findUserEntityByPersonUsernameAndPersonDeleted(buyerUsername, false);
+        if(buyer.isEmpty()){
+            return false;
+        }
+        Optional<ArticleEntity> article = this.articleEntityRepository.findArticleEntityByIdAndDeletedAndSold(articleId, false, false);
+        if(article.isEmpty())
+        {
+            return false;
+        }
+        article.get().setSold(true);
+        article.get().setBuyer(buyer.get());
+        this.articleEntityRepository.save(article.get());
+        return true;
     }
 
     private void setAttributesInArticle(ArticleEntity article, List<AttributeRequest> attributesRequest)

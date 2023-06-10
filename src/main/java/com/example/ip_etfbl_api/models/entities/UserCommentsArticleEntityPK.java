@@ -14,11 +14,11 @@ public class UserCommentsArticleEntityPK implements Serializable {
 
     @Column(name = "article_id", nullable = false)
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer articleId;
     @Column(name = "user_id", nullable = false)
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer userId;
 
     public Integer getArticleId() {

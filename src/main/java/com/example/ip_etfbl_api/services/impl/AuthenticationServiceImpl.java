@@ -1,5 +1,7 @@
 package com.example.ip_etfbl_api.services.impl;
 
+import com.example.ip_etfbl_api.exceptions.ConflictException;
+import com.example.ip_etfbl_api.exceptions.NotFoundException;
 import com.example.ip_etfbl_api.models.entities.PersonEntity;
 import com.example.ip_etfbl_api.models.entities.UserEntity;
 import com.example.ip_etfbl_api.models.enums.Role;
@@ -11,11 +13,18 @@ import com.example.ip_etfbl_api.repositories.PersonEntityRepository;
 import com.example.ip_etfbl_api.repositories.UserEntityRepository;
 import com.example.ip_etfbl_api.services.AuthenticationService;
 import com.example.ip_etfbl_api.services.JwtService;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import jakarta.transaction.Transactional;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Random;
 
 @Service
 @Transactional
@@ -25,17 +34,23 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final JavaMailSender mailService;
 
-    public AuthenticationServiceImpl(PersonEntityRepository personEntityRepository, UserEntityRepository userEntityRepository, LocationEntityRepository locationEntityRepository, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager) {
+    public AuthenticationServiceImpl(PersonEntityRepository personEntityRepository, UserEntityRepository userEntityRepository, LocationEntityRepository locationEntityRepository, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager, JavaMailSender mailService) {
         this.personEntityRepository = personEntityRepository;
         this.locationEntityRepository = locationEntityRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
+        this.mailService = mailService;
     }
 
     @Override
-    public AuthResponse registerUser(UserRegisterRequest req) {
+    public Boolean registerUser(UserRegisterRequest req) throws MessagingException {
+        if(personEntityRepository.existsPersonEntityByUsernameOrUserEmail(req.getUsername(), req.getEmail()))
+        {
+            throw new ConflictException();
+        }
         var person = new PersonEntity();
         person.setName(req.getName());
         person.setSurname(req.getSurname());
@@ -46,23 +61,63 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         //var savedPerson = personEntityRepository.saveAndFlush(person);
         var user = new UserEntity();
         user.setPerson(person);
-        user.setActivated(true);
-        user.setPin(3333);
+        user.setActivated(false);
+        Random rand = new Random();
+        user.setPin(rand.nextInt(8999)+1000);
         user.setEmail(req.getEmail());
         System.out.println(req.getCityName());
         user.setLocation(locationEntityRepository.findLocationEntityByName(req.getCityName()).get());
         //var savedUser = userEntityRepository.saveAndFlush(user);
         person.setUser(user);
         var savedPerson = personEntityRepository.save(person);
-        var jwtToken = jwtService.generateToken(savedPerson);
-        return new AuthResponse(jwtToken);
+        MimeMessage mail = formMessage(savedPerson.getUser().getEmail(),
+                savedPerson.getUser().getPin(), "Profile activation");
+        mailService.send(mail);
+        return true;
     }
 
     @Override
-    public AuthResponse authenticateUser(AuthRequest req) {
+    public AuthResponse authenticateUser(AuthRequest req) throws MessagingException {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(req.getUsername(), req.getPassword()));
         var user = personEntityRepository.findByUsername(req.getUsername()).orElseThrow();
-        var jwtToken = jwtService.generateToken(user);
-        return new AuthResponse(jwtToken);
+        if(user.getUser().getActivated())
+        {
+            var jwtToken = jwtService.generateToken(user);
+            return new AuthResponse(jwtToken, true);
+        }else
+        {
+            Random rand = new Random();
+            user.getUser().setPin(rand.nextInt(8999)+1000);
+            var updated = personEntityRepository.save(user);
+            MimeMessage message = formMessage(updated.getUser().getEmail(), updated.getUser().getPin(), "Activate profile");
+            mailService.send(message);
+            return new AuthResponse(null, false);
+        }
     }
+
+    @Override
+    public AuthResponse activateProfile(Integer pin, String username) {
+        var user = personEntityRepository.findByUsernameAndDeletedAndUserPin(username, false, pin);
+        if(user.isEmpty())
+        {
+            throw new NotFoundException();
+        }else
+        {
+            user.get().getUser().setActivated(true);
+            var updatedUser = personEntityRepository.save(user.get());
+            var jwtToken = jwtService.generateToken(updatedUser);
+            return new AuthResponse(jwtToken, true);
+        }
+    }
+
+    private MimeMessage formMessage(String to, Integer pin, String subject) throws MessagingException {
+        MimeMessage mail = mailService.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(mail, true);
+        helper.setTo(to);
+        helper.setSubject(subject);
+        helper.setText("This is your PIN code for profile activation: " +
+                pin);
+        return mail;
+    }
+
 }
