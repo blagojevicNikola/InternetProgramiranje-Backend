@@ -15,7 +15,7 @@ public class NewArticleRequest {
     private String title;
     private BigDecimal price;
     private String details;
-    private Integer categoryId;
+    private String categoryName;
     private List<AttributeRequest> attributes;
     private Boolean isNew;
 }

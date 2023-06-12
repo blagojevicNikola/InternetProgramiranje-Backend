@@ -116,7 +116,10 @@ public class ArticleController extends CrudController<Integer, Article, Article>
         return ResponseEntity.status(409).body(null);
     }
 
-    @PutMapping(value="/update/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    //Using POST instead of PUT request is necessary in this case.
+    //When using PUT, Spring Boot throw's an exception saying it doesn't support application/octet-stream Content Type
+    //Tomcat configuration is probably causing that behaviour
+    @PostMapping(value="/update/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ArticleInfo> updateArticle(@PathVariable("id") int id,
                                                      @RequestPart NewArticleRequest newArticle,
                                                      @RequestPart Optional<List<MultipartFile>> newPhotos,

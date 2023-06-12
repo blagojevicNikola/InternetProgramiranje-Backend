@@ -11,6 +11,11 @@ import java.util.Objects;
 @Table(name = "user_comments_article", schema = "etfbl_ip", catalog = "")
 @IdClass(UserCommentsArticleEntityPK.class)
 public class UserCommentsArticleEntity {
+
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @Column(name = "id", nullable = false)
+    private Integer id;
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "article_id", nullable = false)

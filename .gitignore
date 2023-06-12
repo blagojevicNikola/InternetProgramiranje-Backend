@@ -4,6 +4,9 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+### Sensitive Data ###
+src/main/resources/application.properties
+
 ### STS ###
 .apt_generated
 .classpath
@@ -12,7 +15,6 @@ target/
 .settings
 .springBeans
 .sts4-cache
-.application.properties
 
 ### IntelliJ IDEA ###
 .idea

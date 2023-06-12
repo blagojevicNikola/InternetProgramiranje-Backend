@@ -11,7 +11,10 @@ import java.util.Objects;
 
 @Data
 public class UserCommentsArticleEntityPK implements Serializable {
-
+    @Column(name = "id", nullable = false)
+    @Id
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
     @Column(name = "article_id", nullable = false)
     @Id
     //@GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -72,7 +72,7 @@ public class ArticleServiceImpl extends CrudJpaService<ArticleEntity, Integer> i
 
     @Override
     public Optional<ArticleInfo> addArticle(NewArticleRequest request, List<String> photoUrls, String username) {
-        Optional<ArticleTypeEntity> type = this.articleTypeRepository.findById(request.getCategoryId());
+        Optional<ArticleTypeEntity> type = this.articleTypeRepository.findArticleTypeEntityByName(request.getCategoryName());
         if(type.isEmpty())
             return Optional.empty();
         Optional<UserEntity> user = this.userEntityRepository.findUserEntityByPersonUsername(username);
@@ -112,7 +112,7 @@ public class ArticleServiceImpl extends CrudJpaService<ArticleEntity, Integer> i
 
     @Override
     public Optional<ArticleInfo> updateArticle(Integer id, NewArticleRequest request, List<String> photos, String username) {
-        Optional<ArticleTypeEntity> type = this.articleTypeRepository.findById(request.getCategoryId());
+        Optional<ArticleTypeEntity> type = this.articleTypeRepository.findArticleTypeEntityByName(request.getCategoryName());
         if(type.isEmpty())
             return Optional.empty();
         ArticleEntity toBeUpdated = articleEntityRepository.findArticleEntityByIdAndDeletedAndUserPersonUsername(id, false, username);
@@ -252,13 +252,14 @@ public class ArticleServiceImpl extends CrudJpaService<ArticleEntity, Integer> i
     private void setPhotosInArticle(ArticleEntity article, List<String> photoUrls)
     {
         List<PhotoEntity> photos = new ArrayList<>();
-        if(photoUrls!=null)
-        {
+        if(photoUrls!=null) {
             for (String photoUrl : photoUrls) {
-                PhotoEntity tmp = new PhotoEntity();
-                tmp.setArticle(article);
-                tmp.setUrl(photoUrl);
-                photos.add(tmp);
+                if (article.getPhotos().stream().noneMatch(p -> p.getUrl().equals(photoUrl))) {
+                    PhotoEntity tmp = new PhotoEntity();
+                    tmp.setArticle(article);
+                    tmp.setUrl(photoUrl);
+                    photos.add(tmp);
+                }
             }
         }
         article.setPhotos(photos);
@@ -276,12 +277,17 @@ public class ArticleServiceImpl extends CrudJpaService<ArticleEntity, Integer> i
     private void updateAttributes(List<AttributeRequest> attributes, ArticleEntity article)
     {
         List<AttributeEntity> toAdd = article.getAttributes();
+        List<AttributeEntity> toBeRemoved = new ArrayList<>();
         toAdd.forEach(old -> {
             if(attributes.stream().noneMatch(nev -> old.getName().equals(nev.getName())))
             {
-                toAdd.remove(old);
+                toBeRemoved.add(old);
                 this.attributeEntityRepository.deleteAttributeEntityByArticleIdAndName(article.getId(), old.getName());
             }
+        });
+        toAdd.removeAll(toBeRemoved);
+        toBeRemoved.forEach(tbr -> {
+            this.attributeEntityRepository.deleteAttributeEntityByArticleIdAndName(article.getId(), tbr.getName());
         });
         attributes.forEach(s ->{
            Optional<AttributeEntity> tmp = article.getAttributes().stream().filter(a -> s.getName().equals(a.getName())).findFirst();
