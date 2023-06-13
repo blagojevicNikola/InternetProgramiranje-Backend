@@ -1,6 +1,7 @@
 package com.example.ip_etfbl_api.controllers;
 
 import com.example.ip_etfbl_api.base.CrudController;
+import com.example.ip_etfbl_api.exceptions.ForbiddenException;
 import com.example.ip_etfbl_api.models.requests.NewArticleRequest;
 import com.example.ip_etfbl_api.models.responses.Article;
 import com.example.ip_etfbl_api.models.responses.ArticleInfo;
@@ -80,6 +81,19 @@ public class ArticleController extends CrudController<Integer, Article, Article>
         return service.findAllByDeletedAndSoldAndUsername(Article.class, false, true, name, pageNo, pageSize);
     }
 
+    @GetMapping("/bought/user/{name}")
+    public Slice<Article> getBoughtArticlesByUser(@PathVariable String name,@RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
+                                                  @RequestParam(value = "pageSize", defaultValue = "8", required = false) int pageSize, Authentication authentication){
+
+        String username = authentication.getName();
+        if(!username.equals(name))
+        {
+            throw new ForbiddenException();
+        }
+        return service.findAllByBuyer(Article.class, username, pageNo, pageSize);
+    }
+
+
     @GetMapping("/info/{id}")
     public ArticleInfo getArticleInfoById(@PathVariable Integer id) {
         return service.getArticleInfoById(id);
@@ -96,6 +110,7 @@ public class ArticleController extends CrudController<Integer, Article, Article>
     public Slice<Article> searchArticles(@RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
                                          @RequestParam(value = "pageSize", defaultValue = "6", required = false) int pageSize,
                                          @RequestParam(value = "category", required = false) String category,
+
                                          @RequestParam Map<String,String> allParams,
                                          @RequestParam(value="sort", required = false)String sort)
     {

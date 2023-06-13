@@ -214,6 +214,12 @@ public class ArticleServiceImpl extends CrudJpaService<ArticleEntity, Integer> i
     }
 
     @Override
+    public <T> Page<T> findAllByBuyer(Class<T> resultDto, String username, int pageNo, int pageSize) {
+        return articleEntityRepository.findArticleEntitiesByDeletedAndSoldAndBuyerPersonUsername(false, false, username, PageRequest.of(pageNo, pageSize))
+                .map(a -> this.getModelMapper().map(a, resultDto));
+    }
+
+    @Override
     public Boolean buyAnArticle(Integer articleId, String buyerUsername) {
 
         Optional<UserEntity> buyer = this.userEntityRepository.findUserEntityByPersonUsernameAndPersonDeleted(buyerUsername, false);
