@@ -8,6 +8,7 @@ import jakarta.mail.MessagingException;
 public interface AuthenticationService {
     Boolean registerUser(UserRegisterRequest req) throws MessagingException;
     AuthResponse authenticateUser(AuthRequest req) throws MessagingException;
+    Boolean authenticateAdmin(AuthRequest req);
 
     AuthResponse activateProfile(Integer pin, String username);
 

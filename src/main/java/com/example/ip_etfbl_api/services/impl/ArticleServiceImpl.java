@@ -192,6 +192,12 @@ public class ArticleServiceImpl extends CrudJpaService<ArticleEntity, Integer> i
         String pt = params.remove("priceTo");
         BigDecimal priceFrom = pf==null ? null : BigDecimal.valueOf(Double.parseDouble(pf));
         BigDecimal priceTo = pt==null ? null : BigDecimal.valueOf(Double.parseDouble(pt));
+        String articleState = params.remove("s");
+        Boolean isNew = null;
+        if(articleState!=null)
+        {
+            isNew = "new".equals(articleState);
+        }
         List<String> values = new ArrayList<>();
         List<String> names = new ArrayList<>();
         params.forEach((k,v) -> {if(!v.isEmpty())
@@ -201,7 +207,7 @@ public class ArticleServiceImpl extends CrudJpaService<ArticleEntity, Integer> i
         }
         });
 
-        Page<ArticleEntity> tmpSlice = this.articleEntityRepository.findArticleEntitiesByTypeIdWithQuery(false, false, locationId, search, priceFrom, priceTo,category
+        Page<ArticleEntity> tmpSlice = this.articleEntityRepository.findArticleEntitiesByTypeIdWithQuery(false, false, locationId, search, isNew, priceFrom, priceTo,category
                 , names, values, names.size(), values.size(), PageRequest.of(pageNo, pageSize,sort));
         return tmpSlice.map(a -> this.getModelMapper().map(a, resultDto));
     }

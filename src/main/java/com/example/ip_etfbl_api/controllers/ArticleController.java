@@ -110,7 +110,6 @@ public class ArticleController extends CrudController<Integer, Article, Article>
     public Slice<Article> searchArticles(@RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
                                          @RequestParam(value = "pageSize", defaultValue = "6", required = false) int pageSize,
                                          @RequestParam(value = "category", required = false) String category,
-
                                          @RequestParam Map<String,String> allParams,
                                          @RequestParam(value="sort", required = false)String sort)
     {

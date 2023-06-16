@@ -34,18 +34,18 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(e.getData(), e.getStatus());
     }
 
-    @ExceptionHandler(Exception.class)
-    public final ResponseEntity<Object> handleException(Exception e, HandlerMethod handlerMethod)
-    {
-        LoggingUtil.logException(e, getLog(handlerMethod));
-        return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
     @ExceptionHandler(AuthenticationException.class)
     public final ResponseEntity<Object> handleAuthenticationException(AuthenticationException e, HandlerMethod handlerMethod)
     {
         LoggingUtil.logException(e, getLog(handlerMethod));
         return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public final ResponseEntity<Object> handleException(Exception e, HandlerMethod handlerMethod)
+    {
+        LoggingUtil.logException(e, getLog(handlerMethod));
+        return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(BadCredentialsException.class)

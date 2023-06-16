@@ -1,6 +1,7 @@
 package com.example.ip_etfbl_api.services.impl;
 
 import com.example.ip_etfbl_api.exceptions.ConflictException;
+import com.example.ip_etfbl_api.exceptions.ForbiddenException;
 import com.example.ip_etfbl_api.exceptions.NotFoundException;
 import com.example.ip_etfbl_api.models.entities.PersonEntity;
 import com.example.ip_etfbl_api.models.entities.UserEntity;
@@ -8,6 +9,7 @@ import com.example.ip_etfbl_api.models.enums.Role;
 import com.example.ip_etfbl_api.models.requests.AuthRequest;
 import com.example.ip_etfbl_api.models.requests.UserRegisterRequest;
 import com.example.ip_etfbl_api.models.responses.AuthResponse;
+import com.example.ip_etfbl_api.repositories.AdminEntityRepository;
 import com.example.ip_etfbl_api.repositories.LocationEntityRepository;
 import com.example.ip_etfbl_api.repositories.PersonEntityRepository;
 import com.example.ip_etfbl_api.repositories.UserEntityRepository;
@@ -16,7 +18,6 @@ import com.example.ip_etfbl_api.services.JwtService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.transaction.Transactional;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,14 +31,16 @@ import java.util.Random;
 @Transactional
 public class AuthenticationServiceImpl implements AuthenticationService {
     private final PersonEntityRepository personEntityRepository;
+    private final AdminEntityRepository adminEntityRepository;
     private final LocationEntityRepository locationEntityRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final JavaMailSender mailService;
 
-    public AuthenticationServiceImpl(PersonEntityRepository personEntityRepository, UserEntityRepository userEntityRepository, LocationEntityRepository locationEntityRepository, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager, JavaMailSender mailService) {
+    public AuthenticationServiceImpl(PersonEntityRepository personEntityRepository, UserEntityRepository userEntityRepository, AdminEntityRepository adminEntityRepository, LocationEntityRepository locationEntityRepository, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager, JavaMailSender mailService) {
         this.personEntityRepository = personEntityRepository;
+        this.adminEntityRepository = adminEntityRepository;
         this.locationEntityRepository = locationEntityRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
@@ -93,6 +96,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             mailService.send(message);
             return new AuthResponse(null, false);
         }
+    }
+
+    @Override
+    public Boolean authenticateAdmin(AuthRequest req) {
+        if(adminEntityRepository.existsAdminEntityByUsernameAndPassword(req.getUsername(), req.getPassword()))
+        {
+            return true;
+        }
+        throw new ForbiddenException();
     }
 
     @Override

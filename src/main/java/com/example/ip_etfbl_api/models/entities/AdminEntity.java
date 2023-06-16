@@ -9,51 +9,26 @@ import java.util.Objects;
 @Data
 @Entity
 @Table(name = "admin", schema = "etfbl_ip", catalog = "")
-public class AdminEntity implements BaseEntity<Integer> {
+public class AdminEntity {
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    @Column(name = "person_id")
-    private Integer personId;
-    @OneToOne
-    @MapsId
-    @JoinColumn(name = "person_id", referencedColumnName = "id")
-    private PersonEntity person;
+    @Column(name = "id")
+    private Integer id;
 
-    public Integer getPersonId() {
-        return personId;
-    }
+    @Basic
+    @Column(name="name", nullable = false, length = 100)
+    private String name;
 
-    public void setPersonId(Integer personId) {
-        this.personId = personId;
-    }
+    @Basic
+    @Column(name="surname", nullable=false, length = 100)
+    private String surname;
 
-    public PersonEntity getPerson() {
-        return person;
-    }
+    @Basic
+    @Column(name="username", nullable=false, length=100, unique = true)
+    private String username;
 
-    public void setPerson(PersonEntity person) {
-        this.person = person;
-    }
+    @Basic
+    @Column(name="password", nullable = false, length=100)
+    private String password;
 
-    @Override
-    public Integer getId() {
-        return personId;
-    }
-
-    @Override
-    public void setId(Integer integer) {
-        personId=integer;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        AdminEntity that = (AdminEntity) o;
-        return Objects.equals(personId, that.personId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(personId);
-    }
 }
